@@ -50,7 +50,7 @@ class GoogleSheetsController extends Controller
       //This will cause the cells with '=RAND(...)' to be refreshed twice.
     }
 
-<<<<<<< HEAD
+    /* CISC 4900 refresh func
     public function refreshSheetValues(Request $request) {
       echo "we are in refreshPage() function";
       
@@ -67,12 +67,8 @@ class GoogleSheetsController extends Controller
       $google_sheet->setSingleValue($spreadsheetId, $range, [[$tempValue]]);
       //$google_sheet->setSingleValue($spreadsheetId, $range, $originalValue);
       echo json_encode($originalValue);
+    */
 
-
-
-
-
-=======
    /** populateSpreadsheet(Request $request)
     * @param $id - string. {id} from the Route (It is the spreadsheet's ID)
     * Do a batch update on the spreadsheet; filling in values, setting cell formats, drawing charts, etc.,
@@ -106,6 +102,6 @@ class GoogleSheetsController extends Controller
       $google_sheet->getSpreadsheet($spreadsheetId);
 
       $google_sheet->test();
->>>>>>> 9e85ca57665ed23a6ad7063e92651ae7fab5a6bf
+
     }
 }

@@ -166,33 +166,30 @@ class GoogleSheets {
     }
   }
 
-<<<<<<< HEAD
+
   //Function to get Spreadsheet with id
-=======
-/** getSpreadsheet($id)
+  /** getSpreadsheet($id)
   * @param $id - string. The id of the spreadsheet you wish to access
   * Saves the spreadsheet object with the spreadsheet id of $id in $this
   *
   * @return void
   */
->>>>>>> 9e85ca57665ed23a6ad7063e92651ae7fab5a6bf
   public function getSpreadsheet($id) {
     $this->spreadsheet = $this->service->spreadsheets->get($id);
     $this->spreadsheetId = $this->spreadsheet->spreadsheetId;
     $this->innerSpreadsheet = $this->spreadsheet->getSheets()[0];
-<<<<<<< HEAD
-
+    $this->mainSpreadsheetTitle = $this->innerSpreadsheet->getProperties()->title;
   }
 
   /*Function to retrieve a value
   public function getSingleValue() {
     return $this->service->spreadsheets_value->get($spreadsheetId, $range)->$getValues;
   }
-  */
-
+  
   public function getSingleValue($spreadsheetId, $range) {
     return $this->service->spreadsheets_values->get($this->spreadsheetId, $range);
   }
+
   public function setSingleValue($spreadsheetId, $range, $value) {
     $body = new \Google_Service_Sheets_ValueRange([
     'values' => $value
@@ -203,11 +200,10 @@ class GoogleSheets {
     ];
 
     $result = $this->service->spreadsheets_values->update($this->spreadsheetId, $range, $body, $params);
-}
-
-=======
-    $this->mainSpreadsheetTitle = $this->innerSpreadsheet->getProperties()->title;
   }
+  
+  */
+
 
 /** getValues($spreadSheetId, $range)
   * @param $spreadSheetId - string. The id of the spreadsheet you wish to access
@@ -271,6 +267,6 @@ class GoogleSheets {
     //This gives us: The class type of chart's specs is : Google_Service_Sheets_ChartSpec
     echo ("The spec contains".json_encode($spec)."\n");
   }
->>>>>>> 9e85ca57665ed23a6ad7063e92651ae7fab5a6bf
+  
 }
  ?>
