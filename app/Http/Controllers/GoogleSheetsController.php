@@ -25,7 +25,26 @@ class GoogleSheetsController extends Controller
         return view('google_sheets')->with('results', $google_sheet->spreadsheet);
     }
 
-    public function refreshSheetValues() {
+    public function refreshSheetValues(Request $request) {
       echo "we are in refreshPage() function";
+      
+      $spreadsheetId = $request->input('spreasheetId'); 
+      $google_sheet = new GoogleSheets;
+      $google_sheet->getSpreadsheet($request->input('spreadsheetId')); 
+
+      $range = "Z100:Z100";
+      $originalValue = $google_sheet->getSingleValue($spreadsheetId, $range)->getValues();
+        do{
+            $tempValue = rand(1,100);
+          } while($tempValue==$originalValue[0][0]);
+            
+      $google_sheet->setSingleValue($spreadsheetId, $range, [[$tempValue]]);
+      //$google_sheet->setSingleValue($spreadsheetId, $range, $originalValue);
+      echo json_encode($originalValue);
+
+
+
+
+
     }
 }

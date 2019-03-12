@@ -153,5 +153,35 @@ class GoogleSheets {
         $driveService->getClient()->setUseBatch(false);
     }
   }
+
+  //Function to get Spreadsheet with id
+  public function getSpreadsheet($id) {
+    $this->spreadsheet = $this->service->spreadsheets->get($id);
+    $this->spreadsheetId = $this->spreadsheet->spreadsheetId;
+    $this->innerSpreadsheet = $this->spreadsheet->getSheets()[0];
+
+  }
+
+  /*Function to retrieve a value
+  public function getSingleValue() {
+    return $this->service->spreadsheets_value->get($spreadsheetId, $range)->$getValues;
+  }
+  */
+
+  public function getSingleValue($spreadsheetId, $range) {
+    return $this->service->spreadsheets_values->get($this->spreadsheetId, $range);
+  }
+  public function setSingleValue($spreadsheetId, $range, $value) {
+    $body = new \Google_Service_Sheets_ValueRange([
+    'values' => $value
+    ]);
+
+    $params = [
+    'valueInputOption' => "USER_ENTERED"
+    ];
+
+    $result = $this->service->spreadsheets_values->update($this->spreadsheetId, $range, $body, $params);
+}
+
 }
  ?>
