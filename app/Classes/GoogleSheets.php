@@ -277,6 +277,7 @@ public function backgroundColor($format, $myRange) {
                 'cell' => [
                     'userEnteredFormat' => $format,
                 ],
+            
             ],
         ])
     ];
@@ -320,7 +321,99 @@ public function colorTest($str) {
 
             return $color;
 }
+    
+    public function disableCell($range, $id, $string) {
+        $requests = [
+        new \Google_Service_Sheets_Request([
+            "addProtectedRange"=> [
+            "protectedRange"=> [
+            //"protectedRangeId": 540122706,
+            "range"=> [
+                'sheetId' => $id,
+                'startRowIndex' => $range->startRowIndex,
+                'endRowIndex' => $range->endRowIndex,
+                'startColumnIndex' => $range->startColumnIndex,
+                'endColumnIndex' => $range->endColumnIndex,
+            ],
+            'description'=> "Protecting",
+            'requestingUserCanEdit'=> true,
+            'editors' => [
+              'users' => [
+                  $string
+              ],
+          ],
+         ],
+        ],
+       ])
+     ];
+        
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+        'requests' => $requests
+    ]);
+    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+        $batchUpdateRequest);
+    }
+    
+    public function FrozenRow($count, $id) {
+        $requests = [
+        new \Google_Service_Sheets_Request([
+            "updateSheetProperties"=> [
+             "properties"=> [
+                "sheetId"=> $id,
+                "gridProperties"=> [
+                   "frozenRowCount"=> $count
+          ]
+        ],
+            "fields"=> "gridProperties.frozenRowCount"
+       ]
+     ])
+    ];
+        
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+        'requests' => $requests
+    ]);
+    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+        $batchUpdateRequest);
+    }
+    
+    public function testAlign($align) {
+        $alignment =  new \stdClass();
+        $alignArray = array("CENTER"=>"CENTER", "LEFT"=>"LEFT","RIGHT"=>"RIGHT");
+        if(isset($alignArray[$align])) {
+            return $alignment->form = $align;
+        }
+        elseif($align == " ") {
+            return $alignment->form = "CENTER";
+        }
+        else{
+            echo("Error: Wrong Alignment");
+        }
+    }
+    
+    public function HorizontalAlignment($range, $alignment) {
+        $requests = [
+        new \Google_Service_Sheets_Request([
+            'repeatCell' => [
+                'cell'=> [
+                  "userEnteredFormat"=> [
+                     "horizontalAlignment" => $alignment,
+                   ]
+                 ],
+                'fields'=> "userEnteredFormat.horizontalAlignment",
+                'range' => $range,
+                
+            
+            ],
+        ])
+    ];
+        
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+        'requests' => $requests
+    ]);
+    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+        $batchUpdateRequest);
+    }
 
-  }
+}
 
- ?>
+?>

@@ -129,5 +129,64 @@ class GoogleSheetsController extends Controller
     $google_sheet->backgroundColor($format, $myRange);
     }   
 
-       
+    
+     public function disableCells(Request $request, $id) {
+         
+         $spreadsheetId = $id;
+         $sheetId =0;
+         $google_sheet = new GoogleSheets;
+         $google_sheet->getSpreadsheet($spreadsheetId);
+         
+         $myRange = $request->input('range');
+         $myRange = $google_sheet->converToRangeObject($myRange);
+         $string = "testing@email.com";
+        
+        $google_sheet->disableCell($myRange, $sheetId, $string);
+     }
+    
+    public function addFrozenRow(Request $request, $id) {
+         $spreadsheetId = $id;
+         $sheetId =0;
+         $google_sheet = new GoogleSheets;
+         $google_sheet->getSpreadsheet($spreadsheetId);
+         
+         $myRange = $request->input('range');
+         $myRange = $google_sheet->converToRangeObject($myRange);
+         
+        $count = 0;
+        $count = $myRange->endRowIndex - $myRange->startRowIndex +1;
+        if($count >= 1) {
+            echo("count = " .$count."\n");
+            echo("start row= " .$myRange->startRowIndex. "\n");
+            echo("end row= " .$myRange->endRowIndex. "\n");
+            $google_sheet->FrozenRow($count, $sheetId);
+        }
+        else {
+            echo ("Error: Wrong Range!");
+        }
+        
+    }
+    
+    public function setHorizontalAlignment(Request $request, $id) {
+         $spreadsheetId = $id;
+         $sheetId =0;
+         $google_sheet = new GoogleSheets;
+         $google_sheet->getSpreadsheet($spreadsheetId);
+         
+         $range = $request->input('range');
+         $range = $google_sheet->converToRangeObject($range);
+         $alignment = $request->input('align');
+         $alignment = $google_sheet->testAlign($alignment);
+         
+        
+        $range = [
+        'sheetId' => $sheetId,
+        'startRowIndex' => $range->startRowIndex,
+        'endRowIndex' => $range->endRowIndex,
+        'startColumnIndex' => $range->startColumnIndex,
+        'endColumnIndex' => $range->endColumnIndex,
+      ];
+        
+        $google_sheet->HorizontalAlignment($range, $alignment);
+    }
 }

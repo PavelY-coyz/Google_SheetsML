@@ -21,11 +21,14 @@
       <button class="btn btn-primary center-block" type="button" id="refresh_rnd_vals_btn" onclick="refresh_random_values();">Refresh Random Values</button>
       &nbsp;&nbsp;
       <button class="btn btn-primary center-block" type="button" id="pop_btn" onclick="populateSpreadsheet();">Populate The Spreadsheet</button>
-    </div>
+      <button class="btn btn-primary center-block" type="button" id="frozen_row_btn" onclick="addFrozenRow();">Frozen Row</button>
+      </div>
     <br />
     <div class="text-center">
     <button class="btn btn-primary center-block" type="button" id="test_btn" onclick="test();">Testing Stuff!</button>
     <button class="btn btn-primary center-block" type="button" id="bgc_btn" onclick="backgroundColor();"> Background Color</button>
+    <button class="btn btn-primary center-block" type="button" id="dc_btn" onclick="disableCells();"> Protected Cells</button>
+    <button class="btn btn-primary center-block" type="button" id="align_btn" onclick="setHorizontalAlignment();"> Set Alignment</button>
     </div>
     <br /><br />
     <pre id="responseText">
@@ -135,6 +138,90 @@ function test() {
         console.log(etype);
       }
     });
-  } 
+  }
+    
+    function disableCells() {
+    $("#dc_btn").attr("disabled", true);
+    console.log("we are in the disableCells function");
+    $.ajax({
+      type: "GET",
+      url: "/api/Sheets_API/disableCells/<?php print $results->spreadsheetId ?>",
+      async: true,
+      cache: false,
+      data: ({
+        'range' : "A1:B7", 
+      }),
+      success: function(result) {
+        $("#dc_btn").attr("disabled", false);
+        console.log("success on ajax");
+        console.log(result);
+        //$("#responseText").html(result);
+      },
+      error: function(data, etype) {
+        $("#dc_btn").attr("disabled", false);
+        console.log("error on ajax");
+        console.log(data);
+        $("#responseText").html(data.responseText);
+        console.log(etype);
+      }
+    });
+  }
+    
+    function addFrozenRow() {
+    $("#frozen_row_btn").attr("disabled", true);
+    console.log("we are in the frozen row function");
+    $.ajax({
+      type: "GET",
+      url: "/api/Sheets_API/addFrozenRow/<?php print $results->spreadsheetId ?>",
+      async: true,
+      cache: false,
+      data: ({
+        'range' : "B2:B4", 
+      }),
+      success: function(result) {
+        $("#frozen_row_btn").attr("disabled", false);
+        console.log("success on ajax");
+        console.log(result);
+        //$("#responseText").html(result);
+      },
+      error: function(data, etype) {
+        $("#frozen_row_btn").attr("disabled", false);
+        console.log("error on ajax");
+        console.log(data);
+        $("#responseText").html(data.responseText);
+        console.log(etype);
+      }
+    });
+    
+    }
+    
+    function setHorizontalAlignment() {
+    $("#align_btn").attr("disabled", true);
+    console.log("we are in the set alignment function");
+    $.ajax({
+      type: "GET",
+      url: "/api/Sheets_API/setHorizontalAlignment/<?php print $results->spreadsheetId ?>",
+      async: true,
+      cache: false,
+      data: ({
+        'range' : "B2:B5",
+        'align' : "CENTER",
+      }),
+      success: function(result) {
+        $("#align_btn").attr("disabled", false);
+        console.log("success on ajax");
+        console.log(result);
+        //$("#responseText").html(result);
+      },
+      error: function(data, etype) {
+        $("#align_btn").attr("disabled", false);
+        console.log("error on ajax");
+        console.log(data);
+        $("#responseText").html(data.responseText);
+        console.log(etype);
+      }
+    });
+    }
+    
 </script>
 @endsection
