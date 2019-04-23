@@ -19,6 +19,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/projects', 'PageController@getProjects')->name('projects');
+Route::get('/testPHP', 'TestPHPController@test');
 
 Route::get('/projects/{id}', 'GoogleSheetsController@getGoogleSheets');
 
