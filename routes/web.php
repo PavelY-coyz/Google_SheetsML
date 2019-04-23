@@ -25,4 +25,9 @@ Route::get('/projects/{id}', 'GoogleSheetsController@getGoogleSheets');
 
 Route::get('/api/Sheets_API/refreshSheetValues/{id}', 'GoogleSheetsController@refreshSheetValues');
 Route::get('/api/Sheets_API/populateSpeadsheet/{id}', 'GoogleSheetsController@populateSpreadsheet');
+Route::get('/api/Sheets_API/setBackgroundColor/{id}', 'GoogleSheetsController@setBackgroundColor');
+Route::get('/api/Sheets_API/disableCells/{id}', 'GoogleSheetsController@disableCells');
+Route::get('/api/Sheets_API/addFrozenRow/{id}', 'GoogleSheetsController@addFrozenRow');
+Route::get('/api/Sheets_API/setHorizontalAlignment/{id}', 'GoogleSheetsController@setHorizontalAlignment');
+
 Route::get('/api/Sheets_API/test/{id}', 'GoogleSheetsController@test');
