@@ -26,6 +26,8 @@
   <br />
   <div class="text-center">
     <button class="btn btn-primary center-block" type="button" id="test_btn" onclick="test();">Testing Stuff!</button>
+    &nbsp;&nbsp; <!-- testing number format-->
+    <button class="btn btn-primary center-block" type="button" id="format_btn" onclick="numberFormat();">Number Format Test</button>
   </div>
   <br /><br />
   <pre id="responseText">
@@ -35,7 +37,7 @@
 <script type="text/javascript">
 //call to internal API to refresh all volatile functions
 //only needs to send the spreadsheet id in data :{}
-//return : null
+//return : null 
 function refresh_random_values() {
   $("#refresh_rnd_vals_btn").attr("disabled", true);
   console.log("we are in the startAjax function");
@@ -111,5 +113,37 @@ function test() {
     }
   });
 }
+
+//Testing cellformat as a button  
+function numberFormat() {
+  $("#format_btn").attr("disabled", true);
+  console.log("we are in the cell format test function");
+  $.ajax({
+    type: "GET",
+    url: "/api/Sheets_API/setNumberFormat/<?php print $results->spreadsheetId ?>",
+    async: true,
+    cache: false,
+    data: ({
+      'range' : "F2:F7",
+      'type' : "NUMBER",
+      //'format' : "#,##0.0###"
+    }),
+    success: function(result) {
+      $("#format_btn").attr("disabled", false);
+      console.log("success on ajax");
+      console.log(result);
+      $("#responseText").html(result);
+    },
+    error: function(data, etype) {
+      $("#format_btn").attr("disabled", false);
+      console.log("error on ajax, something went wrong");
+      console.log(data);
+      $("#responseText").html(data.responseText);
+      console.log(etype);
+    }
+  });
+}
+
+
 </script>
 @endsection

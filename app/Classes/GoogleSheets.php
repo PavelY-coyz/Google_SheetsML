@@ -198,8 +198,8 @@ class GoogleSheets {
     $params = [
     'valueInputOption' => "USER_ENTERED"
     ];
-
     $result = $this->service->spreadsheets_values->update($this->spreadsheetId, $range, $body, $params);
+    
   }
   
   */
@@ -267,6 +267,165 @@ class GoogleSheets {
     //This gives us: The class type of chart's specs is : Google_Service_Sheets_ChartSpec
     echo ("The spec contains".json_encode($spec)."\n");
   }
+
+
+
+  //function to separate the range
+    // public function convertToRangeObject($r){
+    // $range = "AA5:A15";
+    // $splitRange = explode(':', $range);
+    // echo json_encode($splitRange);
+    // // Array( "A1", "AZ15);
+    // $characterValues = Array("A" => 1, "B" => 2, "C"=>3, "D"=>4, "E"=>5,
+    //   "F"=>6, "G"=>7, "H"=>8, "I"=>9, "J"=>10, "K"=>11, "L"=>12, "M"=>13,
+    //   "N"=>14, "O"=>15, "P"=>16, "Q"=>17, "R"=>18, "S"=>19, "T"=>20, "U"=>21,
+    //   "V"=>22, "W"=>23, "X"=>24, "Y"=>25, "Z"=>26);
+
+    // $startingRow = 0;
+    // $startingColumn = 0;
+    // $endingRow = 0;
+    // $endingColumn = 0;
+
+    // $countingArray = Array();
+
+    // $startingString = str_split($splitRange[0]); //A1
+    // echo "startingString - split : ".json_encode($startingString)."\n\n\n";
+    // $endingString = str_split($splitRange[1]); //AZ15
+    // foreach ($startingString as $char) {
+    //   if( isset($characterValues[$char])){
+    //     $countingArray[] = $characterValues[$char]; 
+    //     //$countingArray.push($characterValues[$char]); // (1, 26)
+    //   } else { //number
+    //     $firstOccurance = strpos($splitRange[0], $char); //find occurance
+    //     echo "found first occ : $firstOccurance \n\n\n";
+    //     $startingRow = substr($splitRange[0], $firstOccurance); //1
+    //     break;
+    //   }
+    // }
+    // $power = 0;
+    // for($i=(count($countingArray)-1); $i>=0; $i--) {
+    //   if($i==(count($countingArray)-1)) {
+    //     $startingColumn = $countingArray[$i];
+    //   } else {
+    //     $startingColumn = $startingColumn + ($countingArray[$i]*pow(26,$power));
+    //   }
+    //   $power++;
+    // }
+    // echo ("startingColumn = $startingColumn \n");
+    // echo ("startingRow = $startingRow \n");
+    // }
+
+  public function convertToRangeObject($r) {
+      $range = new \StdClass();
+      $splitRange = explode(":", $r);
+
+      $characterValues = array("A" => 1, "B" => 2, "C"=>3, "D"=>4, "E"=>5, "F"=>6, "G"=>7, "H"=>8,
+      "I"=>9, "J"=>10, "K"=>11, "L"=>12, "M"=>13, "N"=>14, "O"=>15, "P"=>16, "Q"=>17, "R"=>18,
+      "S"=>19, "T"=>20, "U"=>21, "V"=>22, "W"=>23, "X"=>24, "Y"=>25, "Z"=>26);
+
+      $countArray = Array();
+      $startingStr = str_split($splitRange[0]);
+      $endingStr = str_split($splitRange[1]);
+
+      foreach ($startingStr as $char) {
+      if(isset($characterValues[$char])) {
+                  $countArray[] = $characterValues[$char]; //countArray[0]=1
+          } else {
+                  $firstOccur = strpos($splitRange[0], $char);
+                  $startingRow = substr($splitRange[0], $firstOccur);
+                  break;
+        }
+      }
+      $power = 0;
+      for($i=(count($countArray)-1); $i>=0; $i--) {
+        if($i==(count($countArray)-1)) {
+          $startingColumn = $countArray[$i];//this for only one letter
+        } else {
+          $startingColumn = $startingColumn + ($countArray[$i]*pow(26,$power));
+        }
+        $power++;
+      }
+
+      $countArray2 = Array();
+      foreach ($endingStr as $char) {
+      if(isset($characterValues[$char])) {
+                   $countArray2[] = $characterValues[$char];
+          } else {
+                  $firstOccur = strpos($splitRange[1], $char);
+                  $endingRow = substr($splitRange[1], $firstOccur);
+                  break;
+        }
+      }
+
+      for($i=(count($countArray2)-1); $i>=0; $i--) {
+        if($i==(count($countArray2)-1)) {
+          $endingColumn = $countArray2[$i];
+        } else {
+          $endingColumn = $endingColumn + ($countArray2[$i]*pow(26,$power));
+        }
+        $power++;
+      }
+      $range->startRowIndex = $startingRow-1;
+      $range->endRowIndex = $endingRow;
+      $range->startColumnIndex = $startingColumn-1;
+      $range->endColumnIndex = $endingColumn;
+      return $range;
+  }
   
+  /* @param $range  - (string) - in the format "<start_row_name><start_column_name>:<end_row_name><end_column_name>
+     * example: $range = "A1:C15"
+     * @param $type  - (string) - "number"/"percent" - like I have in the cell spreadsheets.cell.format.batchUpdate.json 
+     * @param $format - (string) - format pattern https://developers.google.com/sheets/api/guides/formats 
+     */
+  public function numberFormat($range, $type, $format = ["text", '#0', '##0.0#%', "$#,##0.00", "yyyy-mm-dd", 
+                                                       "hh:mm:ss.00 a/p", "dddd, m/d/yy at h:mm", "0.00e+00"]) 
+  {
+    $requests = [
+        new \Google_Service_Sheets_Request([
+          'repeatCell' => [
+              'range' => $range,
+              'cell' => [
+                'userEnteredFormat' => $type     //$format, this line may needs some tweaking
+              ],
+              'fields' => 'userEnteredFormat.numberFormat'
+          ],
+        ])
+      ];
+    
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest(['requests' => $requests]);
+    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId, $batchUpdateRequest);
+  }
+
+
+  //  ("TEXT" => "text","NUMBER" => "#0", "PERCENT" => "##0.0#%", "CURRENCY" => "$#,##0.00", 
+  //   "DATE" => "yyyy-mm-dd", "TIME" => "hh:mm:ss.00 a/p", "DATE_TIME" => "dddd, m/d/yy at h:mm", "SCIENTIFIC" => "0.00e+00");
+  // For more patterns   https://developers.google.com/sheets/api/guides/formats
+  // Will set the given user pattern
+  public function cellPatternTest($testPattern){
+    $patternType = new \stdClass();
+
+    echo("\nPattern: ". $testPattern);
+    return $patternType->pattern = $testPattern;
+
+  }
+
+  
+  //will check the type and set it if its right
+  public function cellNumberFormatTest($testType){
+    $formatType = new \stdClass();
+    $formatDefault = array("TEXT", "NUMBER", "PERCENT", "CURRENCY", "DATE", "TIME", "DATE_TIME", "SCIENTIFIC");
+
+    //Checks $formatDefault array  if $test is inside the array
+    if(in_array($testType,$formatDefault)) {
+      echo("Number format: ". $testType);
+      return $formatType->type = $testType;
+    }
+    else {
+      echo("Error: Number format not set correctly");
+    }
+    
+    \Log::info("Format Type : ".json_encode($formatType));
+  }
+
 }
  ?>

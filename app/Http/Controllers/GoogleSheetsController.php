@@ -69,6 +69,8 @@ class GoogleSheetsController extends Controller
       echo json_encode($originalValue);
     */
 
+
+
    /** populateSpreadsheet(Request $request)
     * @param $id - string. {id} from the Route (It is the spreadsheet's ID)
     * Do a batch update on the spreadsheet; filling in values, setting cell formats, drawing charts, etc.,
@@ -104,4 +106,59 @@ class GoogleSheetsController extends Controller
       $google_sheet->test();
 
     }
+
+  
+      //function that will set the number format on a givenr range of cells
+      public function setNumberFormat(Request $request, $id) {
+      $spreadsheetId = $id;
+      $sheetId = 0;
+      $google_sheet = new GoogleSheets;
+      $google_sheet ->getSpreadsheet($spreadsheetId);
+
+      $tempRange = $request->input('range');
+      $tempRange =  $google_sheet->convertToRangeObject($tempRange);
+      
+      $formatType = $request->input('type');
+      $formatType = $google_sheet->cellNumberFormatTest($formatType);
+
+      $patternType = $request->input('format');
+      $patternType = $google_sheet->cellPatternTest($patternType);
+
+      //You can comment out endRowIndex if you wish to have new rows be have the same cell format,every other cell row will follow 
+      $myRange = [
+        'sheetId' => $sheetId,
+        'startRowIndex' => $tempRange->startRowIndex,
+        'endRowIndex' => $tempRange->endRowIndex,
+        'startColumnIndex' => $tempRange->startColumnIndex,
+        'endColumnIndex' => $tempRange->endColumnIndex,
+      ];
+
+      //Check log to see if range is set
+      \Log::info("Range: ".json_encode($myRange));
+
+      //check if user puts custom pattern,will check if $patternType is set to a pattern
+      //else just set the type
+      if(isset($patternType) == true){
+        $type = [
+          "numberFormat" => [
+            "type" => $formatType,
+            "pattern" => $patternType
+          ],
+      ];
+      }
+      else {
+        $type = [
+          "numberFormat" => [
+            "type" => $formatType
+          ],
+      ];
+    }
+      
+      \Log::info("Pattern Type : ".json_encode($patternType));
+      \Log::info("Format Type : ".json_encode($formatType));
+      //\Log::info(json_last_error());
+      
+      $google_sheet->numberFormat($myRange,$type);
+    }
+
 }
