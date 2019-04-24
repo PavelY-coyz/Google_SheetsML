@@ -85,6 +85,9 @@ class GoogleSheetsController extends Controller
       $myRange2 = $google_sheet->converToRangeObject($myRange2);
       $color = $request->input('color');
       $color = $google_sheet->colorTest($color);
+      if(isset($color->error)) {
+        return $color->error;
+      }
 
       $myRange = [
         'sheetId' => $sheetId,
@@ -102,7 +105,7 @@ class GoogleSheetsController extends Controller
           //"alpha" => $color->a,
         ],
       ];
-      
+
       $google_sheet->backgroundColor($format, $myRange);
     }
 

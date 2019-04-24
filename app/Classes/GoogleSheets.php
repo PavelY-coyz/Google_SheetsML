@@ -299,18 +299,20 @@ class GoogleSheets {
         $batchUpdateRequest);
   }
 
-  public function colorTest($str) {
+  public function colorTest($usrColor) {
     $color = new \stdClass();
     $pattern = '/^(?:{|\(|\[|)(?:(?:\'|"|)r(?:\'|"|)(?::|=|=>|->)(?<r>[01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]),*()|(?:\'|"|)g(?:\'|"|)(?::|=|=>|->)(?<g>[01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]),*()|(?:\'|"|)b(?:\'|"|)(?::|=|=>|->)(?<b>[01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]),*()){3}\2\4\6(?:}|\)|\]|)$/m';
-    $colorArray = array("red" => "{'r':1,'g':0,'b':0}", "green" => "{'r':0,'g':1,'b':0}",
-    "blue" => "{'r':0,'g':0,'b':1}");
-    $str = str_replace(' ', '', $str);  //remove all white spaces from the color string
+    $colorArray = array("red" => (object)['r'=>255,'g'=>0,'b'=>0],
+                        "green" => (object)['r'=>0,'g'=>255,'b'=>0],
+                        "blue" => (object)['r'=>0,'g'=>0,'b'=>255]
+    );
+    $usrColor = str_replace(' ', '', $usrColor);  //remove all white spaces from the color string
+    $usrColor = strtolower($usrColor); //change string to lowercase.
 
-    if(isset($colorArray[$str])) {
-        $color = json_decode($colorArray[$str]);
-
+    if(isset($colorArray[$usrColor])) {
+        $color = $colorArray[$usrColor];
     } else {
-      if(preg_match($pattern, $str,$matches)) {
+      if(preg_match($pattern, $usrColor,$matches)) {
         //\Log::info('matches: '.json_encode($matches));
         $color->r = $matches["r"];
         $color->g = $matches["g"];
@@ -320,6 +322,7 @@ class GoogleSheets {
         $color->error= "Error color input!";
       }
     }
+
     if(!isset($color->error)) {
       $color->r /= 255;
       $color->g /= 255;
