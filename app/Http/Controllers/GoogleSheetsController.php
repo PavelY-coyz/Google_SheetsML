@@ -55,6 +55,8 @@ class GoogleSheetsController extends Controller
     public function setBackgroundColorRequest($id) {
       //json_decode($color)---change the string into object, $r, $g, $b, $a = 1.0,
       $spreadsheetId = $id;
+      $status = (object)[];
+      $status->location = "setBackgroundColor";
 
       $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
       $range = (isset($_GET['range'])) ? $_GET['range'] : null;
@@ -62,9 +64,9 @@ class GoogleSheetsController extends Controller
       $color = (isset($_GET['color'])) ? $_GET['color'] : null;
       if($range===null) return "Error: Color is not set";
       $range = converToRangeObject($range);
-      if(isset($range->error)) return $range->error;
+      if(isset($range->error)) { $status->error = $range->error; return json_encode($status);}
       $color = validateColor($color);
-      if(isset($color->error)) return $color->error;
+      if(isset($color->error)) { $status->error = $color->error; return json_encode($status);}
 
 
       $google_sheet = new GoogleSheets; //establish a connection to Google API
