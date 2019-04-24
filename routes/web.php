@@ -23,7 +23,7 @@ Route::get('/testPHP', 'TestPHPController@test');
 
 Route::get('/projects/{id}', 'GoogleSheetsController@getGoogleSheets');
 
-Route::get('/api/Sheets_API/refreshSheetValuesRequest/{id}', 'GoogleSheetsController@refreshSheetValuesRequest');
+Route::get('/api/Sheets_API/refreshValuesRequest/{id}', 'GoogleSheetsController@refreshValuesRequest');
 Route::get('/api/Sheets_API/setBackgroundColorRequest/{id}', 'GoogleSheetsController@setBackgroundColorRequest');
 Route::get('/api/Sheets_API/disableCellsRequest/{id}', 'GoogleSheetsController@disableCellsRequest');
 Route::get('/api/Sheets_API/addFrozenRowRequest/{id}', 'GoogleSheetsController@addFrozenRowRequest');

@@ -30,26 +30,12 @@ class GoogleSheetsController extends Controller
     *
     * @return null (effects the spreadsheet directly)
     */
-    public function refreshSheetValuesRequest($id) {
-      //TODO: Find a way to do this w/o having to refresh the values twice.
-      //We need to be able to trigger the refresh of volatile functions just once; and without effecting the rest of the spreadSheet
-
+    public function refreshValuesRequest($id) {
       $spreadSheetId = $id;
       $google_sheet = new GoogleSheets; //establish a connection to Google API
       $google_sheet->getSpreadsheet($spreadSheetId); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
-
-      $range = "A1:A1"; //lets select the value we want to extract. We will use cell A1 for this.
-      $savedValueRange = $google_sheet->getValues($spreadSheetId, $range); //save the current valueRange that is in the cell
-      $saved_value = $savedValueRange->values; //$savedValueRange->getValues() can also be used
-      //$saved_value comes in the format [[value]]
-
-      do{ //lets generate a random number that isnt equal to the saved_value
-        $rand_value = mt_rand(1,100);
-      } while($rand_value==$saved_value[0][0]);
-
-      $google_sheet->setValues($spreadSheetId, $range, Array(Array($rand_value))); //Lets replace the value in A1 with our random value
-      $google_sheet->setValues($spreadSheetId, $range, $saved_value); //Lets place back the original contents of A1
-      //This will cause the cells with '=RAND(...)' to be refreshed twice.
+      $response = $google_sheet->refreshValues();
+      return json_encode($response);
     }
 
     public function setBackgroundColorRequest($id) {

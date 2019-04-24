@@ -81,7 +81,7 @@ function refresh_random_values() {
   console.log("we are in the startAjax function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/refreshSheetValuesRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/refreshValuesRequest/<?php print $results->spreadsheetId ?>",
     async: true,
     cache: false,
     success: function(result) {
