@@ -109,13 +109,29 @@ function validateHorizontalAlignment($align) {
   $alignment =  new \stdClass();
   $align = str_replace(' ', '', $align);  //remove all white spaces from the align string
   $align = strtoupper($align); //change string to uppercase.
-  \Log::info($align);
 
   $validAlignments = array("CENTER", "LEFT", "RIGHT");
   if(in_array($align, $validAlignments)) {
-    return $alignment->form = $align;
+    $alignment->alignment = $align;
+    return $align;
   } else{
-    return $alignment->error = "Error: Invalid Horizontal Alignment given";
+    $alignment->error = "Error: Invalid Horizontal Alignment given.";
+    return $alignment;
+  }
+}
+
+function validateCellType($usrType) {
+  $type = new \stdClass();
+  $usrType = str_replace(' ', '', $usrType);
+  $usrType = strtoupper($usrType);
+
+  $validTypes = array("TEXT", "NUMBER", "PERCENT", "CURRENCY", "DATE", "TIME", "DATE_TIME", "SCIENTIFIC", "NUMBER_FORMAT_TYPE_UNSPECIFIED");
+  if(in_array($usrType, $validTypes)) {
+    $type->type = $usrType;
+    return $usrType;
+  } else{
+    //$type->error = "Error: Invalid Cell Type given.";
+    return "NUMBER_FORMAT_TYPE_UNSPECIFIED";
   }
 }
 

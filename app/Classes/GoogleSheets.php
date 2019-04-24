@@ -330,6 +330,38 @@ class GoogleSheets {
     return $this->request($requests, $location);
   }
 
+  public function setCellFormat($range, $type, $params) {
+    $location = "setCellFormat";
+    $range = [
+      'sheetId' => (isset($params['sheetId'])) ? $params['sheetId'] : 0,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $numberFormat = [
+      "numberFormat" => [
+        "type" => $type,
+        "pattern" => (isset($params['pattern'])) ? $params['pattern'] : null
+      ],
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'cell'=> [
+            "userEnteredFormat"=> $numberFormat
+           ],
+          "fields"=> "userEnteredFormat.numberFormat",
+          'range' => $range,
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
   private function request($requests, $location) {
     $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
         'requests' => $requests
@@ -339,10 +371,11 @@ class GoogleSheets {
     $status->location = $location;
 
     try{
-      $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+      $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
         $batchUpdateRequest);
       $status->error = false;
       $status->message = "$location request : successful";
+      $status->response = $response;
       return $status;
     } catch(\Google_Service_Exception $e) {
       $status->error = true;

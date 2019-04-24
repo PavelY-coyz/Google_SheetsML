@@ -28,6 +28,7 @@ Route::get('/api/Sheets_API/setBackgroundColorRequest/{id}', 'GoogleSheetsContro
 Route::get('/api/Sheets_API/disableCellsRequest/{id}', 'GoogleSheetsController@disableCellsRequest');
 Route::get('/api/Sheets_API/addFrozenRowRequest/{id}', 'GoogleSheetsController@addFrozenRowRequest');
 Route::get('/api/Sheets_API/setHorizontalAlignmentRequest/{id}', 'GoogleSheetsController@setHorizontalAlignmentRequest');
+Route::get('/api/Sheets_API/setCellFormatRequest/{id}', 'GoogleSheetsController@setCellFormatRequest');
 
 //Will be removed
 Route::get('/api/Sheets_API/populateSpeadsheet/{id}', 'GoogleSheetsController@populateSpreadsheet');

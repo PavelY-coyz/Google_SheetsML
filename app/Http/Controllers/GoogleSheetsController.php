@@ -133,6 +133,29 @@ class GoogleSheetsController extends Controller
       return json_encode($response);
     }
 
+    public function setCellFormatRequest($id) {
+      $spreadsheetId = $id;
+      $status = (object)[];
+      $status->location = "setCellFormatRequest";
+
+      $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
+      $range = (isset($_GET['range'])) ? $_GET['range'] : null;
+      if($range===null) { $status->error = "Error: 'range' is not set"; return json_encode($status);}
+      $range = converToRangeObject($range);
+      if(isset($range->error)) { $status->error = $range->error; return json_encode($status);}
+      $type = (isset($_GET['type'])) ? $_GET['type'] : null;
+      if($type===null) { $status->error = "Error: 'type' is not set"; return json_encode($status);}
+      $type = validateCellType($type);
+      if(isset($type->error)) { $status->error = $type->error; return json_encode($status);}
+      $pattern = (isset($_GET['pattern'])) ? $_GET['pattern'] : null;
+
+      $google_sheet = new GoogleSheets;
+      $google_sheet->getSpreadsheet($spreadsheetId);
+
+      $response = $google_sheet->setCellFormat($range, $type, ["sheetId" => $sheetId, "pattern"=>$pattern]);
+      return json_encode($response);
+    }
+
     /** populateSpreadsheet(Request $request)
      * @param $id - string. {id} from the Route (It is the spreadsheet's ID)
      * Do a batch update on the spreadsheet; filling in values, setting cell formats, drawing charts, etc.,

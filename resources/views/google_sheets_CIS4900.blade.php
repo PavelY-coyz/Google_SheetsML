@@ -35,6 +35,19 @@
       <div class="card-body"><input type="text" id="ROWS_TO_FREEZE" size=5/></div>
     </div>
     <br /><br />
+    <div class="card">
+      <div class="card-header">Cell Format Variables</div>
+      <div class="card-body">
+        <div class="card" style="display:inline-block">
+          <div class="card-header">Cell Type</div>
+          <div class="card-body"><input type="text" id="TYPE" size=5/></div>
+        </div>
+        <div class="card" style="display:inline-block">
+          <div class="card-header">Cell Format</div>
+          <div class="card-body"><input type="text" id="PATTERN" size=5/></div>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-primary center-block" type="button" id="refresh_rnd_vals_btn" onclick="refresh_random_values();">Refresh Random Values</button>
     &nbsp;&nbsp;
     <button class="btn btn-primary center-block" type="button" id="pop_btn" onclick="populateSpreadsheet();">Populate The Spreadsheet</button>
@@ -46,6 +59,8 @@
     <button class="btn btn-primary center-block" type="button" id="dc_btn" onclick="disableCells();"> Protected Cells</button>
     &nbsp;&nbsp;
     <button class="btn btn-primary center-block" type="button" id="align_btn" onclick="setHorizontalAlignment();"> Set Alignment</button>
+    &nbsp;&nbsp;
+    <button class="btn btn-primary center-block" type="button" id="format_btn" onclick="setCellFormat();"> Set Cell Format</button>
   </div>
 
   <br />
@@ -205,6 +220,35 @@ function setHorizontalAlignment() {
     data: ({
       'range' : $("#RANGE").val(),
       'alignment' : $("#ALIGNMENT").val(),
+    }),
+    success: function(result) {
+      $("button").attr("disabled", false);
+      console.log("success on ajax");
+      console.log(result);
+      $("#responseText").html(result);
+    },
+    error: function(data, etype) {
+      $("button").attr("disabled", false);
+      console.log("error on ajax");
+      console.log(data);
+      $("#responseText").html(data.responseText);
+      console.log(etype);
+    }
+  });
+}
+
+function setCellFormat() {
+  $("button").attr("disabled", true);
+  console.log("we are in the set cell format function");
+  $.ajax({
+    type: "GET",
+    url: "/api/Sheets_API/setCellFormatRequest/<?php print $results->spreadsheetId ?>",
+    async: true,
+    cache: false,
+    data: ({
+      'range' : $("#RANGE").val(),
+      'type' : $("#TYPE").val(),
+      'pattern' : $("#PATTERN").val()
     }),
     success: function(result) {
       $("button").attr("disabled", false);
