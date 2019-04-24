@@ -104,3 +104,28 @@ function validateColor($usrColor) {
 
   return $color;
 }
+
+function validateHorizontalAlignment($align) {
+  $alignment =  new \stdClass();
+  $align = str_replace(' ', '', $align);  //remove all white spaces from the align string
+  $align = strtoupper($align); //change string to uppercase.
+  \Log::info($align);
+
+  $validAlignments = array("CENTER", "LEFT", "RIGHT");
+  if(in_array($align, $validAlignments)) {
+    return $alignment->form = $align;
+  } else{
+    return $alignment->error = "Error: Invalid Horizontal Alignment given";
+  }
+}
+
+function isPositiveInteger($var) {
+  $var = "".$var;
+  $var = str_replace(' ', '', $var);
+  $pattern = '/^[0-9]+$/m';
+  if(preg_match($pattern, $var,$matches)) {
+    return true;
+  } else {
+    return false;
+  }
+}
