@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Classes\GoogleSheets;
 
+require_once(resource_path("util/util.php"));
+
 class GoogleSheetsController extends Controller
 {
    /** getGoogleSheets($url_string)
@@ -50,38 +52,25 @@ class GoogleSheetsController extends Controller
       //This will cause the cells with '=RAND(...)' to be refreshed twice.
     }
 
-    public function setBackgroundColorRequest(Request $request, $id) {
+    public function setBackgroundColorRequest($id) {
       //json_decode($color)---change the string into object, $r, $g, $b, $a = 1.0,
       $spreadsheetId = $id;
-      $sheetId =0;
+
+      $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
+      $range = (isset($_GET['range'])) ? $_GET['range'] : null;
+      if($range===null) return "Error: Range is not set";
+      $color = (isset($_GET['color'])) ? $_GET['color'] : null;
+      if($range===null) return "Error: Color is not set";
+      $range = converToRangeObject($range);
+      if(isset($range->error)) return $range->error;
+      $color = validateColor($color);
+      if(isset($color->error)) return $color->error;
+
+
       $google_sheet = new GoogleSheets; //establish a connection to Google API
       $google_sheet->getSpreadsheet($spreadsheetId);
-      $myRange2 = $request->input('range');
-      $myRange2 = $google_sheet->converToRangeObject($myRange2);
-      $color = $request->input('color');
-      $color = $google_sheet->colorTest($color);
-      if(isset($color->error)) {
-        return $color->error;
-      }
-
-      $myRange = [
-        'sheetId' => $sheetId,
-        'startRowIndex' => $myRange2->startRowIndex,
-        'endRowIndex' => $myRange2->endRowIndex,
-        'startColumnIndex' => $myRange2->startColumnIndex,
-        'endColumnIndex' => $myRange2->endColumnIndex,
-      ];
-
-      $format = [
-        "backgroundColor" => [
-          "red" => $color->r,
-          "green" => $color->g,
-          "blue" => $color->b,
-          //"alpha" => $color->a,
-        ],
-      ];
-
-      $google_sheet->backgroundColor($format, $myRange);
+      $response = $google_sheet->setBackgroundColor($sheetId, $range, $color);
+      return json_encode($response);
     }
 
     public function disableCellsRequest(Request $request, $id) {
@@ -166,7 +155,7 @@ class GoogleSheetsController extends Controller
       //call the batch update function
       $google_sheet->populateGoogleSpreadsheet($paths);
     }
-     
+
     //Just a testing function
     public function test($id) {
       $spreadsheetId = $id;
