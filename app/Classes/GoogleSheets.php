@@ -245,8 +245,201 @@ class GoogleSheets {
     //https://developers.google.com/sheets/api/guides/values#writing_to_a_single_range
   }
 
+  public function refreshValues($sheetId=0) {
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'copyPaste' => [
+          'source' => [
+            'sheetId' => $sheetId,
+            'startRowIndex' => 0,
+            'endRowIndex' => 1,
+            'startColumnIndex' => 0,
+            'endColumnIndex' => 1,
+          ],
+          'destination' => [
+            'sheetId' => $sheetId,
+            'startRowIndex' => 0,
+            'endRowIndex' => 1,
+            'startColumnIndex' => 0,
+            'endColumnIndex' => 1,
+          ],
+          'pasteType' => 'PASTE_FORMAT',
+          'pasteOrientation' => 'NORMAL'
+        ]
+      ])
+    ];
+    $location = "refreshValues";
+    return $this->request($requests, $location);
+  }
+
+  public function setBackgroundColor($range, $color, $sheetId=0) {
+    $location = "setBackgroundColor";
+    $myRange = [
+      'sheetId' => $sheetId,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $format = [
+      "backgroundColor" => [
+        "red" => $color->r,
+        "green" => $color->g,
+        "blue" => $color->b,
+        //"alpha" => $color->a,
+      ],
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'fields' => 'userEnteredFormat.backgroundColor',
+          'range' => $myRange,
+          'cell' => [
+            'userEnteredFormat' => $format,
+          ],
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function disableCells($range, $email, $sheetId=0) {
+    $location = "disableCells";
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        "addProtectedRange"=> [
+          "protectedRange"=> [
+            //"protectedRangeId": 540122706,
+            "range"=> [
+              'sheetId' => $sheetId,
+              'startRowIndex' => $range->startRowIndex,
+              'endRowIndex' => $range->endRowIndex,
+              'startColumnIndex' => $range->startColumnIndex,
+              'endColumnIndex' => $range->endColumnIndex,
+            ],
+            "warningOnly" => false,
+            'description'=> "Protecting",
+            'requestingUserCanEdit'=> false,
+            'editors' => [
+              'users' => [
+                $email
+              ],
+            ],
+          ],
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function setFrozenRow($rows, $sheetId=0) {
+    $location = "setFrozenRow";
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        "updateSheetProperties"=> [
+          "properties"=> [
+            "sheetId"=> $sheetId,
+            "gridProperties"=> [
+              "frozenRowCount"=> $rows
+            ]
+          ],
+          "fields"=> "gridProperties.frozenRowCount"
+        ]
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function setHorizontalAlignment($range, $alignment, $sheetId=0) {
+    $location = "setHorizontalAlignment";
+
+    $range = [
+      'sheetId' => $sheetId,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'cell'=> [
+            "userEnteredFormat"=> [
+               "horizontalAlignment" => $alignment,
+             ]
+           ],
+          'fields'=> "userEnteredFormat.horizontalAlignment",
+          'range' => $range,
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function setCellFormat($range, $type, $params) {
+    $location = "setCellFormat";
+    $range = [
+      'sheetId' => (isset($params['sheetId'])) ? $params['sheetId'] : 0,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $numberFormat = [
+      "numberFormat" => [
+        "type" => $type,
+        "pattern" => (isset($params['pattern'])) ? $params['pattern'] : null
+      ],
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'cell'=> [
+            "userEnteredFormat"=> $numberFormat
+           ],
+          "fields"=> "userEnteredFormat.numberFormat",
+          'range' => $range,
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  private function request($requests, $location) {
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+        'requests' => $requests
+    ]);
+
+    $status = (object)[];
+    $status->location = $location;
+
+    try{
+      $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+        $batchUpdateRequest);
+      $status->error = false;
+      $status->message = "$location request : successful";
+      $status->response = $response;
+      return $status;
+    } catch(\Google_Service_Exception $e) {
+      $status->error = true;
+      $status->message = $e->getMessage();
+      return $status;
+    }
+  }
+
   //just a test function
   public function test() {
+    /*
     echo ("service->spreadsheets_values is of class: ".get_class($this->service->spreadsheets_values)."\n");
     //This gives us: service->spreadsheets_values is of class: Google_Service_Sheets_Resource_SpreadsheetsValues
     echo ("service->spreadsheets is of class: ".get_class($this->service->spreadsheets)."\n");
@@ -265,7 +458,7 @@ class GoogleSheets {
     $spec = $chart->getSpec();
     echo ("The class type of chart's specs is : ".get_class($spec)."\n");
     //This gives us: The class type of chart's specs is : Google_Service_Sheets_ChartSpec
-    echo ("The spec contains".json_encode($spec)."\n");
+    echo ("The spec contains".json_encode($spec)."\n"); */
   }
   
 }
