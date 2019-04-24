@@ -249,24 +249,7 @@ class GoogleSheets {
       ])
     ];
 
-    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-        'requests' => $requests
-    ]);
-
-    $status = (object)[];
-    $status->location = "setBackgroundColor";
-
-    try{
-      $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
-        $batchUpdateRequest);
-      $status->error = false;
-      $status->message = "setBackgroundColor request : successful";
-      return $status;
-    } catch(\Google_Service_Exception $e) {
-      $status->error = true;
-      $status->message = $e->getMessage();
-      return $status;
-    }
+    return $this->request($requests);
   }
 
   public function disableCell($range, $id, $string) {
@@ -357,6 +340,27 @@ class GoogleSheets {
     ]);
     $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
         $batchUpdateRequest);
+  }
+
+  private function request($requests) {
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+        'requests' => $requests
+    ]);
+
+    $status = (object)[];
+    $status->location = "setBackgroundColor";
+
+    try{
+      $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+        $batchUpdateRequest);
+      $status->error = false;
+      $status->message = "setBackgroundColor request : successful";
+      return $status;
+    } catch(\Google_Service_Exception $e) {
+      $status->error = true;
+      $status->message = $e->getMessage();
+      return $status;
+    }
   }
 
   //just a test function
