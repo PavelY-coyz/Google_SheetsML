@@ -56,13 +56,13 @@ class GoogleSheetsController extends Controller
       //json_decode($color)---change the string into object, $r, $g, $b, $a = 1.0,
       $spreadsheetId = $id;
       $status = (object)[];
-      $status->location = "setBackgroundColor";
+      $status->location = "setBackgroundColorRequest";
 
       $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
       $range = (isset($_GET['range'])) ? $_GET['range'] : null;
-      if($range===null) return "Error: Range is not set";
+      if($range===null) { $status->error = "Error: 'range' is not set"; return json_encode($status);}
       $color = (isset($_GET['color'])) ? $_GET['color'] : null;
-      if($range===null) return "Error: Color is not set";
+      if($range===null) { $status->error = "Error: 'color' is not set"; return json_encode($status);}
       $range = converToRangeObject($range);
       if(isset($range->error)) { $status->error = $range->error; return json_encode($status);}
       $color = validateColor($color);
@@ -71,66 +71,66 @@ class GoogleSheetsController extends Controller
 
       $google_sheet = new GoogleSheets; //establish a connection to Google API
       $google_sheet->getSpreadsheet($spreadsheetId);
-      $response = $google_sheet->setBackgroundColor($sheetId, $range, $color);
+      $response = $google_sheet->setBackgroundColor($range, $color, $sheetId);
       return json_encode($response);
     }
 
-    public function disableCellsRequest(Request $request, $id) {
+    public function disableCellsRequest($id) {
       $spreadsheetId = $id;
-      $sheetId =0;
+      $status = (object)[];
+      $status->location = "disableCellsRequest";
+
+      $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
+      $range = (isset($_GET['range'])) ? $_GET['range'] : null;
+      if($range===null) { $status->error = "Error: 'range' is not set"; return json_encode($status);}
+      $range = converToRangeObject($range);
+      if(isset($range->error)) { $status->error = $range->error; return json_encode($status);}
+
       $google_sheet = new GoogleSheets;
       $google_sheet->getSpreadsheet($spreadsheetId);
+      $email = "testing@email.com";
 
-      $myRange = $request->input('range');
-      $myRange = $google_sheet->converToRangeObject($myRange);
-      $string = "testing@email.com";
-
-      $google_sheet->disableCell($myRange, $sheetId, $string);
+      $response = $google_sheet->disableCells($range, $email, $sheetId);
+      return json_encode($response);
     }
 
-    public function addFrozenRowRequest(Request $request, $id) {
+    public function addFrozenRowRequest($id) {
       $spreadsheetId = $id;
-      $sheetId =0;
+      $status = (object)[];
+      $status->location = "addFrozenRowRequest";
+
+      $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
+      $rows = (isset($_GET['rows'])) ? $_GET['rows'] : null;
+      if($rows===null) { $status->error = "Error: 'rows' is not set"; return json_encode($status);}
+      if(!isPositiveInteger($rows)) { $status->error = "Error: 'rows' must be a positive integer."; return json_encode($status);}
+
       $google_sheet = new GoogleSheets;
       $google_sheet->getSpreadsheet($spreadsheetId);
 
-      $myRange = $request->input('range');
-      $myRange = $google_sheet->converToRangeObject($myRange);
-
-      $count = 0;
-      $count = $myRange->endRowIndex - $myRange->startRowIndex +1;
-      if($count >= 1) {
-        echo("count = " .$count."\n");
-        echo("start row= " .$myRange->startRowIndex. "\n");
-        echo("end row= " .$myRange->endRowIndex. "\n");
-        $google_sheet->FrozenRow($count, $sheetId);
-      }
-      else {
-        echo ("Error: Wrong Range!");
-      }
+      $response = $google_sheet->setFrozenRow($rows, $sheetId);
+      return json_encode($response);
     }
 
-    public function setHorizontalAlignmentRequest(Request $request, $id) {
+    public function setHorizontalAlignmentRequest($id) {
       $spreadsheetId = $id;
-      $sheetId =0;
+      $status = (object)[];
+      $status->location = "setHorizontalAlignmentRequest";
+
+      $sheetId = (isset($_GET['sheetId'])) ? $_GET['sheetId'] : '0';
+      $range = (isset($_GET['range'])) ? $_GET['range'] : null;
+      if($range===null) { $status->error = "Error: 'range' is not set"; return json_encode($status);}
+      $range = converToRangeObject($range);
+      if(isset($range->error)) { $status->error = $range->error; return json_encode($status);}
+      $alignment = (isset($_GET['alignment'])) ? $_GET['alignment'] : null;
+      if($alignment===null) { $status->error = "Error: 'alignment' is not set"; return json_encode($status);}
+      $alignment = validateHorizontalAlignment($alignment);
+      if(isset($alignment->error)) { $status->error = $alignment->error; return json_encode($status);}
+
       $google_sheet = new GoogleSheets;
       $google_sheet->getSpreadsheet($spreadsheetId);
 
-      $range = $request->input('range');
-      $range = $google_sheet->converToRangeObject($range);
-      $alignment = $request->input('align');
-      $alignment = $google_sheet->testAlign($alignment);
-
-
-      $range = [
-        'sheetId' => $sheetId,
-        'startRowIndex' => $range->startRowIndex,
-        'endRowIndex' => $range->endRowIndex,
-        'startColumnIndex' => $range->startColumnIndex,
-        'endColumnIndex' => $range->endColumnIndex,
-      ];
-
-      $google_sheet->HorizontalAlignment($range, $alignment);
+      $response = $google_sheet->setHorizontalAlignment($range, $alignment, $sheetId);
+      return json_encode($response);
     }
 
     /** populateSpreadsheet(Request $request)

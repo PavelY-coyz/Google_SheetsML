@@ -219,7 +219,8 @@ class GoogleSheets {
     //https://developers.google.com/sheets/api/guides/values#writing_to_a_single_range
   }
 
-  public function setBackgroundColor($sheetId, $range, $color) {
+  public function setBackgroundColor($range, $color, $sheetId=0) {
+    $location = "setBackgroundColor";
     $myRange = [
       'sheetId' => $sheetId,
       'startRowIndex' => $range->startRowIndex,
@@ -249,27 +250,29 @@ class GoogleSheets {
       ])
     ];
 
-    return $this->request($requests);
+    return $this->request($requests, $location);
   }
 
-  public function disableCell($range, $id, $string) {
+  public function disableCells($range, $email, $sheetId=0) {
+    $location = "disableCells";
     $requests = [
       new \Google_Service_Sheets_Request([
         "addProtectedRange"=> [
           "protectedRange"=> [
             //"protectedRangeId": 540122706,
             "range"=> [
-              'sheetId' => $id,
+              'sheetId' => $sheetId,
               'startRowIndex' => $range->startRowIndex,
               'endRowIndex' => $range->endRowIndex,
               'startColumnIndex' => $range->startColumnIndex,
               'endColumnIndex' => $range->endColumnIndex,
             ],
+            "warningOnly" => false,
             'description'=> "Protecting",
-            'requestingUserCanEdit'=> true,
+            'requestingUserCanEdit'=> false,
             'editors' => [
               'users' => [
-                $string
+                $email
               ],
             ],
           ],
@@ -277,50 +280,39 @@ class GoogleSheets {
       ])
     ];
 
-    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-        'requests' => $requests
-    ]);
-    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
-        $batchUpdateRequest);
+    return $this->request($requests, $location);
   }
 
-  public function FrozenRow($count, $id) {
-      $requests = [
+  public function setFrozenRow($rows, $sheetId=0) {
+    $location = "setFrozenRow";
+    $requests = [
       new \Google_Service_Sheets_Request([
-          "updateSheetProperties"=> [
-           "properties"=> [
-              "sheetId"=> $id,
-              "gridProperties"=> [
-                 "frozenRowCount"=> $count
-        ]
-      ],
+        "updateSheetProperties"=> [
+          "properties"=> [
+            "sheetId"=> $sheetId,
+            "gridProperties"=> [
+              "frozenRowCount"=> $rows
+            ]
+          ],
           "fields"=> "gridProperties.frozenRowCount"
-     ]
-   ])
-  ];
+        ]
+      ])
+    ];
 
-  $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-      'requests' => $requests
-  ]);
-  $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
-      $batchUpdateRequest);
+    return $this->request($requests, $location);
   }
 
-  public function testAlign($align) {
-    $alignment =  new \stdClass();
-    $alignArray = array("CENTER"=>"CENTER", "LEFT"=>"LEFT","RIGHT"=>"RIGHT");
-    if(isset($alignArray[$align])) {
-      return $alignment->form = $align;
-    }
-    elseif($align == " ") {
-      return $alignment->form = "CENTER";
-    }
-    else{
-      echo("Error: Wrong Alignment");
-    }
-  }
+  public function setHorizontalAlignment($range, $alignment, $sheetId=0) {
+    $location = "setHorizontalAlignment";
 
-  public function HorizontalAlignment($range, $alignment) {
+    $range = [
+      'sheetId' => $sheetId,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
     $requests = [
       new \Google_Service_Sheets_Request([
         'repeatCell' => [
@@ -335,26 +327,22 @@ class GoogleSheets {
       ])
     ];
 
-    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
-        'requests' => $requests
-    ]);
-    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
-        $batchUpdateRequest);
+    return $this->request($requests, $location);
   }
 
-  private function request($requests) {
+  private function request($requests, $location) {
     $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
         'requests' => $requests
     ]);
 
     $status = (object)[];
-    $status->location = "setBackgroundColor";
+    $status->location = $location;
 
     try{
       $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
         $batchUpdateRequest);
       $status->error = false;
-      $status->message = "setBackgroundColor request : successful";
+      $status->message = "$location request : successful";
       return $status;
     } catch(\Google_Service_Exception $e) {
       $status->error = true;
