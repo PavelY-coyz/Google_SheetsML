@@ -65,7 +65,7 @@ function refresh_random_values() {
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
-      //$("#responseText").html(result);
+      $("#responseText").html(result);
     },
     error: function(data, etype) {
       $("button").attr("disabled", false);
@@ -92,7 +92,7 @@ function populateSpreadsheet() {
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
-      //$("#responseText").html(result);
+      $("#responseText").html(result);
     },
     error: function(data, etype) {
       $("button").attr("disabled", false);
@@ -113,14 +113,14 @@ function backgroundColor() {
     async: true,
     cache: false,
     data: ({
-      'range' : "A1:B7",
-      'color' : "{r:112,g:1,b:2}",
+      'range' : $("#RANGE").val(),
+      'color' : $("#COLOR").val(),
     }),
     success: function(result) {
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
-      //$("#responseText").html(result);
+      $("#responseText").html(result);
     },
     error: function(data, etype) {
       $("button").attr("disabled", false);
@@ -147,7 +147,7 @@ function disableCells() {
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
-      //$("#responseText").html(result);
+      $("#responseText").html(result);
     },
     error: function(data, etype) {
       $("button").attr("disabled", false);
@@ -174,7 +174,7 @@ function addFrozenRow() {
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
-      //$("#responseText").html(result);
+      $("#responseText").html(result);
     },
     error: function(data, etype) {
       $("#frozen_row_btn").attr("disabled", false);
@@ -202,7 +202,7 @@ function setHorizontalAlignment() {
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
-      //$("#responseText").html(result);
+      $("#responseText").html(result);
     },
     error: function(data, etype) {
       $("button").attr("disabled", false);
