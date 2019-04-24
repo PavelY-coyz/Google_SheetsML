@@ -24,7 +24,11 @@
     </div>
     <div class="card" style="display:inline-block">
       <div class="card-header">Color</div>
-      <div class="card-body"><input type="text" id="COLOR" size=10/></div>
+      <div class="card-body"><input type="text" id="COLOR" size=20/></div>
+    </div>
+    <div class="card" style="display:inline-block">
+      <div class="card-header">Alignment</div>
+      <div class="card-body"><input type="text" id="ALIGNMENT" size=10/></div>
     </div>
     <br /><br />
     <button class="btn btn-primary center-block" type="button" id="refresh_rnd_vals_btn" onclick="refresh_random_values();">Refresh Random Values</button>
@@ -195,8 +199,8 @@ function setHorizontalAlignment() {
     async: true,
     cache: false,
     data: ({
-      'range' : "B2:B5",
-      'align' : "CENTER",
+      'range' : $("#RANGE").val(),
+      'align' : $("#ALIGNMENT").val(),
     }),
     success: function(result) {
       $("button").attr("disabled", false);
