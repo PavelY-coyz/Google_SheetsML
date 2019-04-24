@@ -58,7 +58,7 @@ function refresh_random_values() {
   console.log("we are in the startAjax function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/refreshSheetValues/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/refreshSheetValuesRequest/<?php print $results->spreadsheetId ?>",
     async: true,
     cache: false,
     success: function(result) {
@@ -109,7 +109,7 @@ function backgroundColor() {
   console.log("we are in the backgroundColor function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/setBackgroundColor/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/setBackgroundColorRequest/<?php print $results->spreadsheetId ?>",
     async: true,
     cache: false,
     data: ({
@@ -137,7 +137,7 @@ function disableCells() {
   console.log("we are in the disableCells function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/disableCells/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/disableCellsRequest/<?php print $results->spreadsheetId ?>",
     async: true,
     cache: false,
     data: ({
@@ -164,7 +164,7 @@ function addFrozenRow() {
   console.log("we are in the frozen row function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/addFrozenRow/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/addFrozenRowRequest/<?php print $results->spreadsheetId ?>",
     async: true,
     cache: false,
     data: ({
@@ -191,7 +191,7 @@ function setHorizontalAlignment() {
   console.log("we are in the set alignment function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/setHorizontalAlignment/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/setHorizontalAlignmentRequest/<?php print $results->spreadsheetId ?>",
     async: true,
     cache: false,
     data: ({

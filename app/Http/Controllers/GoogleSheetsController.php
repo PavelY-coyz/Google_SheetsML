@@ -28,7 +28,7 @@ class GoogleSheetsController extends Controller
     *
     * @return null (effects the spreadsheet directly)
     */
-    public function refreshSheetValues($id) {
+    public function refreshSheetValuesRequest($id) {
       //TODO: Find a way to do this w/o having to refresh the values twice.
       //We need to be able to trigger the refresh of volatile functions just once; and without effecting the rest of the spreadSheet
 
@@ -50,32 +50,7 @@ class GoogleSheetsController extends Controller
       //This will cause the cells with '=RAND(...)' to be refreshed twice.
     }
 
-   /** populateSpreadsheet(Request $request)
-    * @param $id - string. {id} from the Route (It is the spreadsheet's ID)
-    * Do a batch update on the spreadsheet; filling in values, setting cell formats, drawing charts, etc.,
-    * This uses json files
-    *
-    * @return null (effects the spreadsheet directly)
-    */
-    public function populateSpreadsheet($id) {
-      $spreadsheetId = $id;
-
-      $google_sheet = new GoogleSheets; //establish a connection to Google API
-      $google_sheet->getSpreadsheet($spreadsheetId); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
-
-      //set paths for the json files
-      $basePath = 'Google_Sheets_batchUpdates\\';
-      $exercise = 'firstExample\\';
-      $paths = ['values_batch' => resource_path($basePath.$exercise.'spreadsheets.values.batchUpdate.json'),
-                'cellBackgroundColor_batch' => resource_path($basePath.$exercise.'spreadsheets.cell.backgroundColor.batchUpdate.json'),
-                'cellFormat_batch' => resource_path($basePath.$exercise.'spreadsheets.cell.format.batchUpdate.json'),
-                'chart_batch' => resource_path($basePath.$exercise.'spreadsheets.chart.batchUpdate.json'),
-                'protectedRange_batch' => resource_path($basePath.$exercise.'spreadsheets.cell.protectedRange.batchUpdate.json')];
-      //call the batch update function
-      $google_sheet->populateGoogleSpreadsheet($paths);
-    }
-
-    public function setBackgroundColor(Request $request, $id) {
+    public function setBackgroundColorRequest(Request $request, $id) {
       //json_decode($color)---change the string into object, $r, $g, $b, $a = 1.0,
       $spreadsheetId = $id;
       $sheetId =0;
@@ -109,7 +84,7 @@ class GoogleSheetsController extends Controller
       $google_sheet->backgroundColor($format, $myRange);
     }
 
-    public function disableCells(Request $request, $id) {
+    public function disableCellsRequest(Request $request, $id) {
       $spreadsheetId = $id;
       $sheetId =0;
       $google_sheet = new GoogleSheets;
@@ -122,7 +97,7 @@ class GoogleSheetsController extends Controller
       $google_sheet->disableCell($myRange, $sheetId, $string);
     }
 
-    public function addFrozenRow(Request $request, $id) {
+    public function addFrozenRowRequest(Request $request, $id) {
       $spreadsheetId = $id;
       $sheetId =0;
       $google_sheet = new GoogleSheets;
@@ -144,7 +119,7 @@ class GoogleSheetsController extends Controller
       }
     }
 
-    public function setHorizontalAlignment(Request $request, $id) {
+    public function setHorizontalAlignmentRequest(Request $request, $id) {
       $spreadsheetId = $id;
       $sheetId =0;
       $google_sheet = new GoogleSheets;
@@ -167,6 +142,31 @@ class GoogleSheetsController extends Controller
       $google_sheet->HorizontalAlignment($range, $alignment);
     }
 
+    /** populateSpreadsheet(Request $request)
+     * @param $id - string. {id} from the Route (It is the spreadsheet's ID)
+     * Do a batch update on the spreadsheet; filling in values, setting cell formats, drawing charts, etc.,
+     * This uses json files
+     *
+     * @return null (effects the spreadsheet directly)
+     */
+    public function populateSpreadsheet($id) {
+      $spreadsheetId = $id;
+
+      $google_sheet = new GoogleSheets; //establish a connection to Google API
+      $google_sheet->getSpreadsheet($spreadsheetId); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
+
+      //set paths for the json files
+      $basePath = 'Google_Sheets_batchUpdates\\';
+      $exercise = 'firstExample\\';
+      $paths = ['values_batch' => resource_path($basePath.$exercise.'spreadsheets.values.batchUpdate.json'),
+               'cellBackgroundColor_batch' => resource_path($basePath.$exercise.'spreadsheets.cell.backgroundColor.batchUpdate.json'),
+               'cellFormat_batch' => resource_path($basePath.$exercise.'spreadsheets.cell.format.batchUpdate.json'),
+               'chart_batch' => resource_path($basePath.$exercise.'spreadsheets.chart.batchUpdate.json'),
+               'protectedRange_batch' => resource_path($basePath.$exercise.'spreadsheets.cell.protectedRange.batchUpdate.json')];
+      //call the batch update function
+      $google_sheet->populateGoogleSpreadsheet($paths);
+    }
+     
     //Just a testing function
     public function test($id) {
       $spreadsheetId = $id;
