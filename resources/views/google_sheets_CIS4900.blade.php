@@ -30,6 +30,10 @@
       <div class="card-header">Alignment</div>
       <div class="card-body"><input type="text" id="ALIGNMENT" size=10/></div>
     </div>
+    <div class="card" style="display:inline-block">
+      <div class="card-header">Rows to freeze</div>
+      <div class="card-body"><input type="text" id="ROWS_TO_FREEZE" size=5/></div>
+    </div>
     <br /><br />
     <button class="btn btn-primary center-block" type="button" id="refresh_rnd_vals_btn" onclick="refresh_random_values();">Refresh Random Values</button>
     &nbsp;&nbsp;
@@ -145,7 +149,7 @@ function disableCells() {
     async: true,
     cache: false,
     data: ({
-      'range' : "A1:B7",
+      'range' : $("#RANGE").val(),
     }),
     success: function(result) {
       $("button").attr("disabled", false);
@@ -172,7 +176,7 @@ function addFrozenRow() {
     async: true,
     cache: false,
     data: ({
-      'range' : "B2:B4",
+      "rows" : $("#ROWS_TO_FREEZE").val(),
     }),
     success: function(result) {
       $("button").attr("disabled", false);
@@ -200,7 +204,7 @@ function setHorizontalAlignment() {
     cache: false,
     data: ({
       'range' : $("#RANGE").val(),
-      'align' : $("#ALIGNMENT").val(),
+      'alignment' : $("#ALIGNMENT").val(),
     }),
     success: function(result) {
       $("button").attr("disabled", false);
