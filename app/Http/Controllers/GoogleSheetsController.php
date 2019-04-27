@@ -18,8 +18,8 @@ class GoogleSheetsController extends Controller
     */
     public function getGoogleSheets($url_string) {
         $google_sheet = new GoogleSheets; //Connects the object to Google API
-        $google_sheet->createSpreadsheet(); //creates a brand new spreadsheet
-        $google_sheet->setGoogleSpreadsheetPermissions(); //sets default permissions : everyone, read/write
+        $google_sheet->createSpreadsheet([]); //creates a brand new spreadsheet
+        $google_sheet->setGoogleSpreadsheetPermissions([]); //sets default permissions : everyone, read/write
 
         return view($url_string)->with('results', $google_sheet->spreadsheet);
     }
@@ -33,8 +33,8 @@ class GoogleSheetsController extends Controller
     public function refreshValuesRequest($id) {
       $spreadSheetId = $id;
       $google_sheet = new GoogleSheets; //establish a connection to Google API
-      $google_sheet->getSpreadsheet($spreadSheetId); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
-      $response = $google_sheet->refreshValues();
+      $google_sheet->getSpreadsheet(['id'=>$spreadSheetId]); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
+      $response = $google_sheet->refreshValues([]);
       return json_encode($response);
     }
 
@@ -56,8 +56,8 @@ class GoogleSheetsController extends Controller
 
 
       $google_sheet = new GoogleSheets; //establish a connection to Google API
-      $google_sheet->getSpreadsheet($spreadsheetId);
-      $response = $google_sheet->setBackgroundColor($range, $color, $sheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]);
+      $response = $google_sheet->setBackgroundColor(['range'=>$range->value, 'color'=>$color->value, 'sheetId'=>$sheetId]);
       return json_encode($response);
     }
 
@@ -73,10 +73,10 @@ class GoogleSheetsController extends Controller
       if(isset($range->error)) { $status->error = $range->error; return json_encode($status);}
 
       $google_sheet = new GoogleSheets;
-      $google_sheet->getSpreadsheet($spreadsheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]);
       $email = "testing@email.com";
 
-      $response = $google_sheet->disableCells($range, $email, $sheetId);
+      $response = $google_sheet->disableCells(['range'=>$range->value, 'email'=>$email, 'sheetId'=>$sheetId]);
       return json_encode($response);
     }
 
@@ -91,9 +91,9 @@ class GoogleSheetsController extends Controller
       if(!isPositiveInteger($rows)) { $status->error = "Error: 'rows' must be a positive integer."; return json_encode($status);}
 
       $google_sheet = new GoogleSheets;
-      $google_sheet->getSpreadsheet($spreadsheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]);
 
-      $response = $google_sheet->setFrozenRow($rows, $sheetId);
+      $response = $google_sheet->setFrozenRow(['rows'=>$rows, 'sheetId'=>$sheetId]);
       return json_encode($response);
     }
 
@@ -113,9 +113,9 @@ class GoogleSheetsController extends Controller
       if(isset($alignment->error)) { $status->error = $alignment->error; return json_encode($status);}
 
       $google_sheet = new GoogleSheets;
-      $google_sheet->getSpreadsheet($spreadsheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]);
 
-      $response = $google_sheet->setHorizontalAlignment($range, $alignment, $sheetId);
+      $response = $google_sheet->setHorizontalAlignment(['range'=>$range->value, 'alignment'=>$alignment->value, 'sheetId'=>$sheetId]);
       return json_encode($response);
     }
 
@@ -136,9 +136,9 @@ class GoogleSheetsController extends Controller
       $pattern = (isset($_GET['pattern'])) ? $_GET['pattern'] : null;
 
       $google_sheet = new GoogleSheets;
-      $google_sheet->getSpreadsheet($spreadsheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]);
 
-      $response = $google_sheet->setCellFormat($range, $type, ["sheetId" => $sheetId, "pattern"=>$pattern]);
+      $response = $google_sheet->setCellFormat(['range'=>$range->value, 'type'=>$type->value, 'optParams'=>["sheetId" => $sheetId, "pattern"=>$pattern]]);
       return json_encode($response);
     }
 
@@ -153,7 +153,7 @@ class GoogleSheetsController extends Controller
       $spreadsheetId = $id;
 
       $google_sheet = new GoogleSheets; //establish a connection to Google API
-      $google_sheet->getSpreadsheet($spreadsheetId); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]); //fill objects member variables for the spreadsheet with ID : $spreadSheetId);
 
       //set paths for the json files
       $basePath = 'Google_Sheets_batchUpdates\\';
@@ -167,12 +167,52 @@ class GoogleSheetsController extends Controller
       $google_sheet->populateGoogleSpreadsheet($paths);
     }
 
+    public function batchUpdate($id) {
+      $response = (object)["errors"=>[]];
+      if(isset($_POST['params'])) {
+        try{
+          $params = json_decode($_POST['params']); //params should be an object
+
+          if(!is_object($params) || sizeof($params)==0) {
+            $response->errors[] = "batchUpdate : Error - parameters must be an associative array.";
+            return json_encode($response);
+          }
+          $requestList = validateBatchUpdateParameters($params);
+          $requests = [];
+          foreach($requestList as $key => $value) {
+            if(sizeof($value->errors)!=0) {
+              $response->errors[] = $value->errors;
+            } else {
+              $requests[] = $value;
+            }
+          }
+
+          if(sizeof($requests)!=0) {
+            $google_sheet = new GoogleSheets; //establish a connection to Google API
+            foreach($requests as $key => $value) {
+              \Log::info(json_encode($value->functionVariables));
+              $google_sheet->{$value->functionName}($value->functionVariables);
+            }
+          }
+          $response->requests = $requests;
+          return json_encode($response);
+
+        } catch(Exception $e) {
+          $response->errors[] = "batchUpdate : Error - parameters must be in [key => value] association";
+          return json_encode($response);
+        }
+      } else {
+        $response->errors[] = 'batchUpdate : Error - no parameters given.';
+        return json_encode($response);
+      }
+    }
+
     //Just a testing function
     public function test($id) {
       $spreadsheetId = $id;
 
       $google_sheet = new GoogleSheets;
-      $google_sheet->getSpreadsheet($spreadsheetId);
+      $google_sheet->getSpreadsheet(['id'=>$spreadsheetId]);
 
       $google_sheet->test();
     }
