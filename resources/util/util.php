@@ -145,3 +145,20 @@ function isPositiveInteger($var) {
     return false;
   }
 }
+
+//$uri - uri of the request
+//  -> ex: /api/Sheets_API/batchUpdate/{id}
+//$params - array
+function curlRequest($uri, $params) {
+  $url = "http://" . $_SERVER['SERVER_NAME'] . $uri;
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, ['params' => json_encode($params)]);
+
+  // execute!
+  $response = curl_exec($ch);
+
+  // close the connection, release resources used
+  curl_close($ch);
+  return $response;
+}
