@@ -61,7 +61,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function createSpreadsheet() {
+  public function createSpreadsheet($params) {
     // TODO: Assign values to desired properties of `requestBody`:
     $this->requestBody = new \Google_Service_Sheets_Spreadsheet();
 
@@ -128,7 +128,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function setGoogleSpreadsheetPermissions() {
+  public function setGoogleSpreadsheetPermissions($params) {
     $driveService = new \Google_Service_Drive($this->client);
     $driveService->getClient()->setUseBatch(true);
 
@@ -174,7 +174,8 @@ class GoogleSheets {
   *
   * @return void
   */
-  public function getSpreadsheet($id) {
+  public function getSpreadsheet($params) {
+    $id = $params['id'];
     $this->spreadsheet = $this->service->spreadsheets->get($id);
     $this->spreadsheetId = $this->spreadsheet->spreadsheetId;
     $this->innerSpreadsheet = $this->spreadsheet->getSheets()[0];
@@ -212,8 +213,10 @@ class GoogleSheets {
   *
   * @return Instance of ValueRange : https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values#ValueRange
   */
-  public function getValues($spreadSheetId, $range) {
-    return $this->service->spreadsheets_values->get($spreadSheetId, $range);
+  public function getValues($params) {
+    $spreadsheetId = $params['id'];
+    $range = $params['valueRange'];
+    return $this->service->spreadsheets_values->get($spreadsheetId, $range);
   }
 
 /** setValues($spreadSheetId, $range, $values)
@@ -228,24 +231,35 @@ class GoogleSheets {
   *
   * @return void : Changes the content of the actual Spreadsheet
   */
-  public function setValues($spreadSheetId, $range, $values, $params=['valueInputOption' => 'USER_ENTERED'],
-                                                             $majorDimension="ROWS")
+  public function setValues($params)
   {
+    $spreadsheetId = $params['id'];
+    $range = $params['range'];
+    $values = $params['values'];
+    $optParams = $params['optParams'];
     $requestBody = new \Google_Service_Sheets_ValueRange(); //create a ValueRange object
+
+    if(!isset($optParams['majorDimension'])) {
+      $majorDimension = "ROWS";
+    } else {
+      $majorDimension = $optParams['majorDimension'];
+      unset($optParams['majorDimension']);
+    }
     $requestBody->majorDimension = $majorDimension;
     $requestBody->range = $range;
     $requestBody->values = $values;
 
     //make sure that $params['valueInputOption'] is set
-    if(!isset($params['valueInputOption'])) {
-      $params['valueInputOption'] = 'USER_ENTERED'; //if it isnt; set it here to the default value
+    if(!isset($optParams['valueInputOption'])) {
+      $optParams['valueInputOption'] = 'USER_ENTERED'; //if it isnt; set it here to the default value
     }
 
-    $this->service->spreadsheets_values->update($spreadSheetId, $range, $requestBody, $params); //run the update
+    $this->service->spreadsheets_values->update($spreadsheetId, $range, $requestBody, $optParams); //run the update
     //https://developers.google.com/sheets/api/guides/values#writing_to_a_single_range
   }
 
-  public function refreshValues($sheetId=0) {
+  public function refreshValues($params) {
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
     $requests = [
       new \Google_Service_Sheets_Request([
         'copyPaste' => [
@@ -272,7 +286,10 @@ class GoogleSheets {
     return $this->request($requests, $location);
   }
 
-  public function setBackgroundColor($range, $color, $sheetId=0) {
+  public function setBackgroundColor($params) {
+    $range = $params['range'];
+    $color = $params['color'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
     $location = "setBackgroundColor";
     $myRange = [
       'sheetId' => $sheetId,
@@ -306,7 +323,10 @@ class GoogleSheets {
     return $this->request($requests, $location);
   }
 
-  public function disableCells($range, $email, $sheetId=0) {
+  public function disableCells($params) {
+    $range = $params['range'];
+    $email = $params['email'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
     $location = "disableCells";
     $requests = [
       new \Google_Service_Sheets_Request([
@@ -336,7 +356,9 @@ class GoogleSheets {
     return $this->request($requests, $location);
   }
 
-  public function setFrozenRow($rows, $sheetId=0) {
+  public function setFrozenRow($params) {
+    $rows = $params['rows'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
     $location = "setFrozenRow";
     $requests = [
       new \Google_Service_Sheets_Request([
@@ -355,7 +377,11 @@ class GoogleSheets {
     return $this->request($requests, $location);
   }
 
-  public function setHorizontalAlignment($range, $alignment, $sheetId=0) {
+  public function setHorizontalAlignment($params) {
+    $range = $params['range'];
+    $alignment = $params['alignment'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
+
     $location = "setHorizontalAlignment";
 
     $range = [
@@ -383,10 +409,14 @@ class GoogleSheets {
     return $this->request($requests, $location);
   }
 
-  public function setCellFormat($range, $type, $params) {
+  public function setCellFormat($params) {
+    $range = $params['range'];
+    $type = $params['type'];
+    $optParams = (array)$params['optParams'];
     $location = "setCellFormat";
+    \Log::info("optParams : ".json_encode($optParams));
     $range = [
-      'sheetId' => (isset($params['sheetId'])) ? $params['sheetId'] : 0,
+      'sheetId' => (isset($optParams['sheetId'])) ? $optParams['sheetId'] : 0,
       'startRowIndex' => $range->startRowIndex,
       'endRowIndex' => $range->endRowIndex,
       'startColumnIndex' => $range->startColumnIndex,
@@ -396,7 +426,7 @@ class GoogleSheets {
     $numberFormat = [
       "numberFormat" => [
         "type" => $type,
-        "pattern" => (isset($params['pattern'])) ? $params['pattern'] : null
+        "pattern" => (isset($optParams['pattern'])) ? $optParams['pattern'] : null
       ],
     ];
 

@@ -1,4 +1,5 @@
 <?php
+use App\Classes\GoogleAPIRequest;
 
 function converToRangeObject($r) {
   $range = new \StdClass();
@@ -63,10 +64,11 @@ function converToRangeObject($r) {
     $power++;
   }
 
-  $range->startRowIndex = ($startingRow <= $endingRow) ? $startingRow-1 : $endingRow-1;
-  $range->endRowIndex = ($startingRow > $endingRow) ? $startingRow : $endingRow;
-  $range->startColumnIndex = ($startingColumn <= $endingColumn) ? $startingColumn-1 : $endingColumn-1;
-  $range->endColumnIndex = ($startingColumn > $endingColumn) ? $startingColumn : $endingColumn;
+  $range->value = new \StdClass();
+  $range->value->startRowIndex = ($startingRow <= $endingRow) ? $startingRow-1 : $endingRow-1;
+  $range->value->endRowIndex = ($startingRow > $endingRow) ? $startingRow : $endingRow;
+  $range->value->startColumnIndex = ($startingColumn <= $endingColumn) ? $startingColumn-1 : $endingColumn-1;
+  $range->value->endColumnIndex = ($startingColumn > $endingColumn) ? $startingColumn : $endingColumn;
 
   return $range;
 }
@@ -83,14 +85,15 @@ function validateColor($usrColor) {
   $usrColor = str_replace(' ', '', $usrColor);  //remove all white spaces from the color string
   $usrColor = strtolower($usrColor); //change string to lowercase.
 
+  $color->value = new \StdClass();
   if(isset($colorArray[$usrColor])) {
-      $color = $colorArray[$usrColor];
+      $color->value = $colorArray[$usrColor];
   } else {
     if(preg_match($pattern, $usrColor,$matches)) {
       //\Log::info('matches: '.json_encode($matches));
-      $color->r = $matches["r"];
-      $color->g = $matches["g"];
-      $color->b = $matches["b"];
+      $color->value->r = $matches["r"];
+      $color->value->g = $matches["g"];
+      $color->value->b = $matches["b"];
 
     } else {
       $color->error= "Error: Invalid Color given.";
@@ -98,9 +101,9 @@ function validateColor($usrColor) {
     }
   }
 
-  $color->r /= 255;
-  $color->g /= 255;
-  $color->b /=255;
+  $color->value->r /= 255;
+  $color->value->g /= 255;
+  $color->value->b /=255;
 
   return $color;
 }
@@ -112,8 +115,8 @@ function validateHorizontalAlignment($align) {
 
   $validAlignments = array("CENTER", "LEFT", "RIGHT");
   if(in_array($align, $validAlignments)) {
-    $alignment->alignment = $align;
-    return $align;
+    $alignment->value = $align;
+    return $alignment;
   } else{
     $alignment->error = "Error: Invalid Horizontal Alignment given.";
     return $alignment;
@@ -127,21 +130,84 @@ function validateCellType($usrType) {
 
   $validTypes = array("TEXT", "NUMBER", "PERCENT", "CURRENCY", "DATE", "TIME", "DATE_TIME", "SCIENTIFIC", "NUMBER_FORMAT_TYPE_UNSPECIFIED");
   if(in_array($usrType, $validTypes)) {
-    $type->type = $usrType;
-    return $usrType;
+    $type->value = $usrType;
+    return $type;
   } else{
     //$type->error = "Error: Invalid Cell Type given.";
-    return "NUMBER_FORMAT_TYPE_UNSPECIFIED";
+    return $type->error = "NUMBER_FORMAT_TYPE_UNSPECIFIED";
+  }
+}
+
+function validateRange($r) {
+  $range = new \StdClass();
+  $r = str_replace(' ', '', $r);  //remove all white spaces from the range string
+  $r = strtoupper($r); //change string to lowercase.
+  $pattern = '/^(?:(?<start>[A-Z]+[1-9]+[0-9]*):(?<end>[A-Z]+[1-9]+[0-9]*))$/m';
+  if(preg_match($pattern, $r,$matches)) {
+    //\Log::info('matches: '.json_encode($matches));
+    $range->value = $r;
+    return $range;
+  } else {
+    $range->error = "Error: Invalid Range given. Please use the \"A1:B10\" range notation (row must be &gt 0).";
+    return $range;
   }
 }
 
 function isPositiveInteger($var) {
+  $result = new \StdClass();
   $var = "".$var;
   $var = str_replace(' ', '', $var);
   $pattern = '/^[0-9]+$/m';
   if(preg_match($pattern, $var,$matches)) {
-    return true;
+    $result->value = $var;
+    return $result;
   } else {
-    return false;
+    $result->error = "$var is not a positive integer.";
+    return $result;
   }
+}
+
+function printArray($arr) {
+  if(!is_array($arr)) {
+    return "(variable is not an array)";
+  } else {
+    $ps = "[";
+    $i = 0;
+    foreach($arr as $key => $value) {
+      $ps.= ($i>0) ? ", ".$value : $value;
+      $i++;
+    }
+    $ps.= "]";
+  }
+  return $ps;
+}
+
+function validateBatchUpdateParameters($params) {
+  $requests = [];
+  foreach($params as $key => $value) {
+    $requests[] = new GoogleAPIRequest($key, $value);
+  }
+  \Log::info(json_encode($requests));
+  return $requests;
+}
+
+//$uri - uri of the request
+//  -> ex: /api/Sheets_API/batchUpdate/{id}
+//$params - array
+function curlRequest($uri, $params) {
+  //$_SERVER['SERVER_NAME'] will need to change to API server's base URL
+  //This function will be used by the server that is making a call to the API
+  $url = "http://" . $_SERVER['SERVER_NAME'] . $uri;
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, ["params" => json_encode((Array)$params)]);
+
+  // execute!
+  $response = curl_exec($ch);
+
+  // close the connection, release resources used
+  curl_close($ch);
+
+  //curl_exec returns an encoded string - decode before returning
+  return json_decode($response);
 }

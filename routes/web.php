@@ -29,6 +29,7 @@ Route::get('/api/Sheets_API/disableCellsRequest/{id}', 'GoogleSheetsController@d
 Route::get('/api/Sheets_API/addFrozenRowRequest/{id}', 'GoogleSheetsController@addFrozenRowRequest');
 Route::get('/api/Sheets_API/setHorizontalAlignmentRequest/{id}', 'GoogleSheetsController@setHorizontalAlignmentRequest');
 Route::get('/api/Sheets_API/setCellFormatRequest/{id}', 'GoogleSheetsController@setCellFormatRequest');
+Route::post('/api/Sheets_API/batchUpdate/{id}', 'GoogleSheetsController@batchUpdate');
 
 //Will be removed
 Route::get('/api/Sheets_API/populateSpeadsheet/{id}', 'GoogleSheetsController@populateSpreadsheet');

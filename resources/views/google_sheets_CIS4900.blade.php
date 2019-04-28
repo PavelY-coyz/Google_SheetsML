@@ -1,6 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
+<?php
+  require_once(resource_path("util/util.php"));
+
+  $params = [
+    //'setGoogleSpreadsheetPermissions' => (object)[],
+    'getSpreadsheet' => (object)['id' => $results->spreadsheetId],
+    'refreshValues' => (object)[],
+    "setBackgroundColor" => (object)['range' => 'A1:A6', 'color' => 'r=255,g=0,b=0', 'sheetId'=>0],
+    'disableCells' => (object)['range' => "A1:A6", 'email'=>'testmail@test.com', 'sheetId'=>0],
+    'setFrozenRow' => (object)['rows' => 1, 'sheetId'=>0],
+    'setHorizontalAlignment' => (object)['alignment'=>"CENTER", "range"=>"B1:B6",'sheetId'=>0],
+    'setCellFormat' => (object)['range'=>"B1:B6", "type"=>"PERCENT", "optParams"=>["pattern"=>"0.0#%"]]
+  ];
+  //$params = [];
+
+  $response = (curlRequest("/api/Sheets_API/batchUpdate/".$results->spreadsheetId, $params));
+ ?>
+
+<pre>
+  <?php
+      $requests = $response->requests;
+      for($i=0;$i<sizeof($requests);$i++) {
+        print json_encode($requests[$i])."<br />";
+      }
+   ?>
+</pre>
 <h1 class="text-center">Google Sheets (PHP5.6)</h1>
 <div class="container">
   <div class="card">
