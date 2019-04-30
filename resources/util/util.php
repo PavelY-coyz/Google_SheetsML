@@ -200,6 +200,7 @@ function curlRequest($uri, $params) {
   $url = "http://" . $_SERVER['SERVER_NAME'] . $uri;
   $ch = curl_init($url);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 30);
   curl_setopt($ch, CURLOPT_POSTFIELDS, ["params" => json_encode((Array)$params)]);
 
   // execute!
