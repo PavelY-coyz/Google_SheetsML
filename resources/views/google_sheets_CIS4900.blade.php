@@ -14,19 +14,22 @@
     'setHorizontalAlignment' => (object)['alignment'=>"CENTER", "range"=>"B1:B6",'sheetId'=>0],
     'setCellFormat' => (object)['range'=>"B1:B6", "type"=>"PERCENT", "optParams"=>["pattern"=>"0.0#%"]]
   ];
-  //$params = [];
-
+/*  //$params = [];
+  Log::info("Line 18 executed");
   $response = (curlRequest("/api/Sheets_API/batchUpdate/".$results->spreadsheetId, $params));
+  Log::info("Line 20 executed");
+  Log::info("VIEW response = ".json_encode($response));
  ?>
 
 <pre>
   <?php
       $requests = $response->requests;
       for($i=0;$i<sizeof($requests);$i++) {
-        print json_encode($requests[$i])."<br />";
+        print 'VIEW FOR LOOP : '.json_encode($requests[$i])."<br />";
       }
    ?>
-</pre>
+</pre> */
+?>
 <h1 class="text-center">Google Sheets (PHP5.6)</h1>
 <div class="container">
   <div class="card">
@@ -99,6 +102,33 @@
 </div>
 
 <script type="text/javascript">
+
+$(document).ready(function() {
+  console.log(".ready fired!");
+  $("#responseText").html(".ready fiiiiired");
+
+  $.ajax({
+    type: "POST",
+    url: "/api/Sheets_API/batchUpdate/<?php print $results->spreadsheetId ?>",
+    async: true,
+    cache: false,
+    data: <?php print json_encode(["params" => (array)$params]); ?>,
+    success: function(result) {
+      $("button").attr("disabled", false);
+      console.log("success on ajax");
+      console.log(result);
+      $("#responseText").html(result);
+    },
+    error: function(data, etype) {
+      $("button").attr("disabled", false);
+      console.log("error on ajax");
+      console.log(data);
+      $("#responseText").html(data.responseText);
+      console.log(etype);
+    }
+  });
+
+});
 //call to internal API to refresh all volatile functions
 //only needs to send the spreadsheet id in data :{}
 //return : null
