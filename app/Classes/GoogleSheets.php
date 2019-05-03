@@ -39,8 +39,8 @@ class GoogleSheets {
   public function __construct()
   {
     //TODO: Add option to use spreadsheetId as a parameter. And add the contents of getSpreadsheet() if spreadsheetId is not null
-    $this->credentials = resource_path('\php_libraries\Google_Sheets_API\credentials\credentials.json');
-    $this->client_secret = resource_path('\php_libraries\Google_Sheets_API\credentials\client_secret.json');
+    $this->credentials = resource_path('/php_libraries/Google_Sheets_API/credentials/credentials.json');
+    $this->client_secret = resource_path('/php_libraries/Google_Sheets_API/credentials/client_secret.json');
 
     $this->client = new \Google_Client();
     $this->client->setApplicationName('crypto-symbol-205814');
@@ -186,7 +186,7 @@ class GoogleSheets {
   public function getSingleValue() {
     return $this->service->spreadsheets_value->get($spreadsheetId, $range)->$getValues;
   }
-  
+
   public function getSingleValue($spreadsheetId, $range) {
     return $this->service->spreadsheets_values->get($this->spreadsheetId, $range);
   }
@@ -202,7 +202,7 @@ class GoogleSheets {
 
     $result = $this->service->spreadsheets_values->update($this->spreadsheetId, $range, $body, $params);
   }
-  
+
   */
 
 
@@ -490,6 +490,6 @@ class GoogleSheets {
     //This gives us: The class type of chart's specs is : Google_Service_Sheets_ChartSpec
     echo ("The spec contains".json_encode($spec)."\n"); */
   }
-  
+
 }
  ?>
