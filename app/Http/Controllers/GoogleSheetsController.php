@@ -171,9 +171,9 @@ class GoogleSheetsController extends Controller
       $response = (object)["errors"=>[]];
       if(isset($_POST['params'])) {
         try{
-          $params = json_decode($_POST['params']); //params should be an object
+          $params = (gettype($_POST['params'])=="string") ? json_decode($_POST['params']) : $_POST['params']; //params should be an object
 
-          if(!is_object($params) || sizeof($params)==0) {
+          if( (!is_object($params) && !is_array($params)) || sizeof($params)==0) {
             $response->errors[] = "batchUpdate : Error - parameters must be an associative array.";
             return json_encode($response);
           }
