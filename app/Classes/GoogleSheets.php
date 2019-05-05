@@ -61,7 +61,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function createSpreadsheet($params) {
+  public function createSpreadsheet($params=[]) {
     // TODO: Assign values to desired properties of `requestBody`:
     $this->requestBody = new \Google_Service_Sheets_Spreadsheet();
 
@@ -128,7 +128,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function setGoogleSpreadsheetPermissions($params) {
+  public function setGoogleSpreadsheetPermissions($params=[]) {
     $driveService = new \Google_Service_Drive($this->client);
     $driveService->getClient()->setUseBatch(true);
 

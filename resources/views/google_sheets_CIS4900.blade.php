@@ -5,9 +5,12 @@
   require_once(resource_path("util/util.php"));
 
   $params = [
-    //'setGoogleSpreadsheetPermissions' => (object)[],
-    'getSpreadsheet' => (object)['id' => $results->spreadsheetId],
-    'refreshValues' => (object)[],
+    //createSpreadsheet/setGoogleSpreadsheetPermissions technically dont have any parameters.
+    //currently unable to call them without having a null parameter....
+    'createSpreadsheet' => (object)['optParams' => null],
+    'setGoogleSpreadsheetPermissions' => (object)['optParams' => null],
+    //'getSpreadsheet' => (object)['id' => "someValidId"],
+    'refreshValues' => (object)['sheetId' => 0],
     "setBackgroundColor" => (object)['range' => 'A1:A6', 'color' => 'r=255,g=0,b=0', 'sheetId'=>0],
     'disableCells' => (object)['range' => "A1:A6", 'email'=>'testmail@test.com', 'sheetId'=>0],
     'setFrozenRow' => (object)['rows' => 1, 'sheetId'=>0],
@@ -37,12 +40,10 @@
     <div class="card-body">
       Here we will use the Google Sheets API v4 to create, edit and share spreadsheets
       <br  /><br  />
-      <iframe src="{{ rtrim($results->spreadsheetUrl) }}" height='600px' width='100%' scrolling="yes"></iframe>
+      <iframe id="spreadsheet" src="" height='600px' width='100%' scrolling="yes"></iframe>
       <br  /><br  />
       <pre>
-        <?php //print_r($results);
-        ?>
-        spreadsheetId = <?php print $results->spreadsheetId ?>
+        spreadsheetId = <span id="spreadsheetId"></span>
       </pre>
     </div>
   </div>
@@ -114,7 +115,9 @@ $(document).ready(function() {
     cache: false,
     data: <?php print json_encode(["params" => (array)$params]); ?>,
     success: function(result) {
-      tmp = result;
+      tmp = JSON.parse(result);
+      $("#spreadsheet").attr("src", tmp.spreadsheetUrl);
+      $("#spreadsheetId").text(tmp.spreadsheetId);
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
@@ -138,7 +141,7 @@ function refresh_random_values() {
   console.log("we are in the startAjax function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/refreshValuesRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/refreshValuesRequest/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     success: function(result) {
@@ -165,7 +168,7 @@ function populateSpreadsheet() {
   console.log("we are in the populateSpreadsheet function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/populateSpeadsheet/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/populateSpeadsheet/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     success: function(result) {
@@ -189,7 +192,7 @@ function backgroundColor() {
   console.log("we are in the backgroundColor function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/setBackgroundColorRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/setBackgroundColorRequest/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     data: ({
@@ -217,7 +220,7 @@ function disableCells() {
   console.log("we are in the disableCells function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/disableCellsRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/disableCellsRequest/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     data: ({
@@ -244,7 +247,7 @@ function addFrozenRow() {
   console.log("we are in the frozen row function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/addFrozenRowRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/addFrozenRowRequest/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     data: ({
@@ -271,7 +274,7 @@ function setHorizontalAlignment() {
   console.log("we are in the set alignment function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/setHorizontalAlignmentRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/setHorizontalAlignmentRequest/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     data: ({
@@ -299,7 +302,7 @@ function setCellFormat() {
   console.log("we are in the set cell format function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/setCellFormatRequest/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/setCellFormatRequest/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     data: ({
@@ -329,7 +332,7 @@ function test() {
   console.log("we are in the test function");
   $.ajax({
     type: "GET",
-    url: "/api/Sheets_API/test/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/test/"+$("#spreadsheetId").text(),
     async: true,
     cache: false,
     success: function(result) {
