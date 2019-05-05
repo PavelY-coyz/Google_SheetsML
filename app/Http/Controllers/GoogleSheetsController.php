@@ -167,7 +167,7 @@ class GoogleSheetsController extends Controller
       $google_sheet->populateGoogleSpreadsheet($paths);
     }
 
-    public function batchUpdate($id) {
+    public function batchUpdate() {
       $response = (object)["errors"=>[]];
       if(isset($_POST['params'])) {
         try{

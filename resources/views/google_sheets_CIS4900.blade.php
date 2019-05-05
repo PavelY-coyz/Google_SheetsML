@@ -109,11 +109,12 @@ $(document).ready(function() {
 
   $.ajax({
     type: "POST",
-    url: "/api/Sheets_API/batchUpdate/<?php print $results->spreadsheetId ?>",
+    url: "/api/Sheets_API/batchUpdate",
     async: true,
     cache: false,
     data: <?php print json_encode(["params" => (array)$params]); ?>,
     success: function(result) {
+      tmp = result;
       $("button").attr("disabled", false);
       console.log("success on ajax");
       console.log(result);
