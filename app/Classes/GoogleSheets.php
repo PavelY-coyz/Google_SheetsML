@@ -61,7 +61,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function createSpreadsheet($params) {
+  public function createSpreadsheet($params=[]) {
     // TODO: Assign values to desired properties of `requestBody`:
     $this->requestBody = new \Google_Service_Sheets_Spreadsheet();
 
@@ -128,7 +128,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function setGoogleSpreadsheetPermissions($params) {
+  public function setGoogleSpreadsheetPermissions($params=[]) {
     $driveService = new \Google_Service_Drive($this->client);
     $driveService->getClient()->setUseBatch(true);
 
@@ -214,7 +214,7 @@ class GoogleSheets {
   * @return Instance of ValueRange : https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values#ValueRange
   */
   public function getValues($params) {
-    $spreadsheetId = $params['id'];
+    $spreadsheetId = $this->spreadsheetId;
     $range = $params['valueRange'];
     return $this->service->spreadsheets_values->get($spreadsheetId, $range);
   }
@@ -233,10 +233,10 @@ class GoogleSheets {
   */
   public function setValues($params)
   {
-    $spreadsheetId = $params['id'];
-    $range = $params['range'];
+    $spreadsheetId = $this->spreadsheetId;
+    $range = $params['valueRange'];
     $values = $params['values'];
-    $optParams = $params['optParams'];
+    $optParams = (!isset($params['optParams'])) ? [] : $params['optParams'];
     $requestBody = new \Google_Service_Sheets_ValueRange(); //create a ValueRange object
 
     if(!isset($optParams['majorDimension'])) {
@@ -414,7 +414,7 @@ class GoogleSheets {
     $type = $params['type'];
     $optParams = (array)$params['optParams'];
     $location = "setCellFormat";
-    \Log::info("optParams : ".json_encode($optParams));
+    //\Log::info("optParams : ".json_encode($optParams));
     $range = [
       'sheetId' => (isset($optParams['sheetId'])) ? $optParams['sheetId'] : 0,
       'startRowIndex' => $range->startRowIndex,

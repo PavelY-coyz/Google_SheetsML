@@ -17,11 +17,11 @@ class GoogleSheetsController extends Controller
     * @return view (with the spreadsheet object as parameter)
     */
     public function getGoogleSheets($url_string) {
-        $google_sheet = new GoogleSheets; //Connects the object to Google API
-        $google_sheet->createSpreadsheet([]); //creates a brand new spreadsheet
-        $google_sheet->setGoogleSpreadsheetPermissions([]); //sets default permissions : everyone, read/write
+        //$google_sheet = new GoogleSheets; //Connects the object to Google API
+        //$google_sheet->createSpreadsheet(); //creates a brand new spreadsheet
+        //$google_sheet->setGoogleSpreadsheetPermissions(); //sets default permissions : everyone, read/write
 
-        return view($url_string)->with('results', $google_sheet->spreadsheet);
+        return view($url_string);//->with('results', $google_sheet->spreadsheet);
     }
 
    /** refreshSheetValues(Request $request)
@@ -167,7 +167,8 @@ class GoogleSheetsController extends Controller
       $google_sheet->populateGoogleSpreadsheet($paths);
     }
 
-    public function batchUpdate($id) {
+    public function batchUpdate() {
+      //\Log::info("param :".json_encode($_POST['params']));
       $response = (object)["errors"=>[]];
       if(isset($_POST['params'])) {
         try{
@@ -190,11 +191,17 @@ class GoogleSheetsController extends Controller
           if(sizeof($requests)!=0) {
             $google_sheet = new GoogleSheets; //establish a connection to Google API
             foreach($requests as $key => $value) {
-              \Log::info(json_encode($value->functionVariables));
-              $google_sheet->{$value->functionName}($value->functionVariables);
+              //\Log::info(json_encode($value->functionVariables));
+              $requests[$key]->response = $google_sheet->{$value->functionName}($value->functionVariables);
             }
           }
           $response->requests = $requests;
+          if(isset($google_sheet->spreadsheetId)) {
+            $response->spreadsheetUrl = $google_sheet->spreadsheet->spreadsheetUrl;
+            $response->spreadsheetId = $google_sheet->spreadsheetId;
+          } else {
+            $response->spreadsheetId = "SpreadsheetId is not set";
+          }
           return json_encode($response);
 
         } catch(Exception $e) {

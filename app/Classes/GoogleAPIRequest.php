@@ -17,11 +17,11 @@ class GoogleAPIRequest {
         'optional' => [],
       ],
       'getValues' => [
-        'required' => ['id', 'valueRange'],
+        'required' => ['valueRange'],
         'optional' => [],
       ],
       'setValues' => [
-        'required' => ['id','valueRange','values'],
+        'required' => ['valueRange','values'],
         'optional' => ['optParams'],
       ],
       'refreshValues' => [
@@ -70,7 +70,8 @@ class GoogleAPIRequest {
       'rows' => [function($r) { return isPositiveInteger($r);}],
       'sheetId' => [function($r) { return $r;}],
       'type' => [function($r) { return validateCellType($r);}],
-      'valueRange' => [function($r) { return validateRange($r);}]
+      'valueRange' => [function($r) { return validateRange($r);}],
+      'values' => [function($r) { return $r;}]
     ];
     $a = func_get_args();
     $i = func_num_args();
@@ -96,6 +97,8 @@ class GoogleAPIRequest {
     if($this->validateParameterNames($func, $params)===false) {
       return;
     }
+
+    //\Log::info("Params (GAR): ".json_encode($params));
 
     if(sizeof($params)!=0) {
       foreach($params as $key => $value) {
@@ -134,7 +137,7 @@ class GoogleAPIRequest {
     $optionalParams = (array)$function->optional;
 
     //to many parameters given!!!
-    \Log::info($this->requestName.' Params : '.json_encode($params).' '.sizeof($params));
+    //\Log::info($this->requestName.' Params : '.json_encode($params).' '.sizeof($params));
     if(sizeof($params)> (sizeof($requiredParams)+sizeof($optionalParams))) {
       $this->errors[] = "Parameters - required: ".sizeof($requiredParams)." , optional : ".
           sizeof($optionalParams)." - parameters given : ".sizeof($params);
