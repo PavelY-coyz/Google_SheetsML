@@ -168,7 +168,7 @@ class GoogleSheetsController extends Controller
     }
 
     public function batchUpdate() {
-      \Log::info("param :".json_encode($_POST['params']));
+      //\Log::info("param :".json_encode($_POST['params']));
       $response = (object)["errors"=>[]];
       if(isset($_POST['params'])) {
         try{
@@ -191,8 +191,8 @@ class GoogleSheetsController extends Controller
           if(sizeof($requests)!=0) {
             $google_sheet = new GoogleSheets; //establish a connection to Google API
             foreach($requests as $key => $value) {
-              \Log::info(json_encode($value->functionVariables));
-              $google_sheet->{$value->functionName}($value->functionVariables);
+              //\Log::info(json_encode($value->functionVariables));
+              $requests[$key]->response = $google_sheet->{$value->functionName}($value->functionVariables);
             }
           }
           $response->requests = $requests;
