@@ -195,6 +195,11 @@ class GoogleSheetsController extends Controller
             }
           }
           $response->requests = $requests;
+          if(isset($google_sheet->spreadsheetId)) {
+            $response->spreadsheetId = $google_sheet->spreadsheetId;
+          } else {
+            $response->spreadsheetId = "SpreadsheetId is not set";
+          }
           return json_encode($response);
 
         } catch(Exception $e) {
