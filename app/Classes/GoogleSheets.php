@@ -39,8 +39,8 @@ class GoogleSheets {
   public function __construct()
   {
     //TODO: Add option to use spreadsheetId as a parameter. And add the contents of getSpreadsheet() if spreadsheetId is not null
-    $this->credentials = resource_path('\php_libraries\Google_Sheets_API\credentials\credentials.json');
-    $this->client_secret = resource_path('\php_libraries\Google_Sheets_API\credentials\client_secret.json');
+    $this->credentials = resource_path('/php_libraries/Google_Sheets_API/credentials/credentials.json');
+    $this->client_secret = resource_path('/php_libraries/Google_Sheets_API/credentials/client_secret.json');
 
     $this->client = new \Google_Client();
     $this->client->setApplicationName('crypto-symbol-205814');
@@ -61,7 +61,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function createSpreadsheet() {
+  public function createSpreadsheet($params) {
     // TODO: Assign values to desired properties of `requestBody`:
     $this->requestBody = new \Google_Service_Sheets_Spreadsheet();
 
@@ -128,7 +128,7 @@ class GoogleSheets {
    *
    * @return void
    */
-  public function setGoogleSpreadsheetPermissions() {
+  public function setGoogleSpreadsheetPermissions($params) {
     $driveService = new \Google_Service_Drive($this->client);
     $driveService->getClient()->setUseBatch(true);
 
@@ -174,7 +174,8 @@ class GoogleSheets {
   *
   * @return void
   */
-  public function getSpreadsheet($id) {
+  public function getSpreadsheet($params) {
+    $id = $params['id'];
     $this->spreadsheet = $this->service->spreadsheets->get($id);
     $this->spreadsheetId = $this->spreadsheet->spreadsheetId;
     $this->innerSpreadsheet = $this->spreadsheet->getSheets()[0];
@@ -185,7 +186,7 @@ class GoogleSheets {
   public function getSingleValue() {
     return $this->service->spreadsheets_value->get($spreadsheetId, $range)->$getValues;
   }
-  
+
   public function getSingleValue($spreadsheetId, $range) {
     return $this->service->spreadsheets_values->get($this->spreadsheetId, $range);
   }
@@ -201,7 +202,7 @@ class GoogleSheets {
     $result = $this->service->spreadsheets_values->update($this->spreadsheetId, $range, $body, $params);
     
   }
-  
+
   */
 
 
@@ -212,8 +213,10 @@ class GoogleSheets {
   *
   * @return Instance of ValueRange : https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values#ValueRange
   */
-  public function getValues($spreadSheetId, $range) {
-    return $this->service->spreadsheets_values->get($spreadSheetId, $range);
+  public function getValues($params) {
+    $spreadsheetId = $params['id'];
+    $range = $params['valueRange'];
+    return $this->service->spreadsheets_values->get($spreadsheetId, $range);
   }
 
 /** setValues($spreadSheetId, $range, $values)
@@ -228,25 +231,245 @@ class GoogleSheets {
   *
   * @return void : Changes the content of the actual Spreadsheet
   */
-  public function setValues($spreadSheetId, $range, $values, $params=['valueInputOption' => 'USER_ENTERED'],
-                                                             $majorDimension="ROWS")
+  public function setValues($params)
   {
+    $spreadsheetId = $params['id'];
+    $range = $params['range'];
+    $values = $params['values'];
+    $optParams = $params['optParams'];
     $requestBody = new \Google_Service_Sheets_ValueRange(); //create a ValueRange object
+
+    if(!isset($optParams['majorDimension'])) {
+      $majorDimension = "ROWS";
+    } else {
+      $majorDimension = $optParams['majorDimension'];
+      unset($optParams['majorDimension']);
+    }
     $requestBody->majorDimension = $majorDimension;
     $requestBody->range = $range;
     $requestBody->values = $values;
 
     //make sure that $params['valueInputOption'] is set
-    if(!isset($params['valueInputOption'])) {
-      $params['valueInputOption'] = 'USER_ENTERED'; //if it isnt; set it here to the default value
+    if(!isset($optParams['valueInputOption'])) {
+      $optParams['valueInputOption'] = 'USER_ENTERED'; //if it isnt; set it here to the default value
     }
 
-    $this->service->spreadsheets_values->update($spreadSheetId, $range, $requestBody, $params); //run the update
+    $this->service->spreadsheets_values->update($spreadsheetId, $range, $requestBody, $optParams); //run the update
     //https://developers.google.com/sheets/api/guides/values#writing_to_a_single_range
+  }
+
+  public function refreshValues($params) {
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'copyPaste' => [
+          'source' => [
+            'sheetId' => $sheetId,
+            'startRowIndex' => 0,
+            'endRowIndex' => 1,
+            'startColumnIndex' => 0,
+            'endColumnIndex' => 1,
+          ],
+          'destination' => [
+            'sheetId' => $sheetId,
+            'startRowIndex' => 0,
+            'endRowIndex' => 1,
+            'startColumnIndex' => 0,
+            'endColumnIndex' => 1,
+          ],
+          'pasteType' => 'PASTE_FORMAT',
+          'pasteOrientation' => 'NORMAL'
+        ]
+      ])
+    ];
+    $location = "refreshValues";
+    return $this->request($requests, $location);
+  }
+
+  public function setBackgroundColor($params) {
+    $range = $params['range'];
+    $color = $params['color'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
+    $location = "setBackgroundColor";
+    $myRange = [
+      'sheetId' => $sheetId,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $format = [
+      "backgroundColor" => [
+        "red" => $color->r,
+        "green" => $color->g,
+        "blue" => $color->b,
+        //"alpha" => $color->a,
+      ],
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'fields' => 'userEnteredFormat.backgroundColor',
+          'range' => $myRange,
+          'cell' => [
+            'userEnteredFormat' => $format,
+          ],
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function disableCells($params) {
+    $range = $params['range'];
+    $email = $params['email'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
+    $location = "disableCells";
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        "addProtectedRange"=> [
+          "protectedRange"=> [
+            //"protectedRangeId": 540122706,
+            "range"=> [
+              'sheetId' => $sheetId,
+              'startRowIndex' => $range->startRowIndex,
+              'endRowIndex' => $range->endRowIndex,
+              'startColumnIndex' => $range->startColumnIndex,
+              'endColumnIndex' => $range->endColumnIndex,
+            ],
+            "warningOnly" => false,
+            'description'=> "Protecting",
+            'requestingUserCanEdit'=> false,
+            'editors' => [
+              'users' => [
+                $email
+              ],
+            ],
+          ],
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function setFrozenRow($params) {
+    $rows = $params['rows'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
+    $location = "setFrozenRow";
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        "updateSheetProperties"=> [
+          "properties"=> [
+            "sheetId"=> $sheetId,
+            "gridProperties"=> [
+              "frozenRowCount"=> $rows
+            ]
+          ],
+          "fields"=> "gridProperties.frozenRowCount"
+        ]
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function setHorizontalAlignment($params) {
+    $range = $params['range'];
+    $alignment = $params['alignment'];
+    $sheetId = (!isset($params['sheetId'])) ? 0 : $params['sheetId'];
+
+    $location = "setHorizontalAlignment";
+
+    $range = [
+      'sheetId' => $sheetId,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'cell'=> [
+            "userEnteredFormat"=> [
+               "horizontalAlignment" => $alignment,
+             ]
+           ],
+          'fields'=> "userEnteredFormat.horizontalAlignment",
+          'range' => $range,
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  public function setCellFormat($params) {
+    $range = $params['range'];
+    $type = $params['type'];
+    $optParams = (array)$params['optParams'];
+    $location = "setCellFormat";
+    \Log::info("optParams : ".json_encode($optParams));
+    $range = [
+      'sheetId' => (isset($optParams['sheetId'])) ? $optParams['sheetId'] : 0,
+      'startRowIndex' => $range->startRowIndex,
+      'endRowIndex' => $range->endRowIndex,
+      'startColumnIndex' => $range->startColumnIndex,
+      'endColumnIndex' => $range->endColumnIndex,
+    ];
+
+    $numberFormat = [
+      "numberFormat" => [
+        "type" => $type,
+        "pattern" => (isset($optParams['pattern'])) ? $optParams['pattern'] : null
+      ],
+    ];
+
+    $requests = [
+      new \Google_Service_Sheets_Request([
+        'repeatCell' => [
+          'cell'=> [
+            "userEnteredFormat"=> $numberFormat
+           ],
+          "fields"=> "userEnteredFormat.numberFormat",
+          'range' => $range,
+        ],
+      ])
+    ];
+
+    return $this->request($requests, $location);
+  }
+
+  private function request($requests, $location) {
+    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest([
+        'requests' => $requests
+    ]);
+
+    $status = (object)[];
+    $status->location = $location;
+
+    try{
+      $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId,
+        $batchUpdateRequest);
+      $status->error = false;
+      $status->message = "$location request : successful";
+      $status->response = $response;
+      return $status;
+    } catch(\Google_Service_Exception $e) {
+      $status->error = true;
+      $status->message = $e->getMessage();
+      return $status;
+    }
   }
 
   //just a test function
   public function test() {
+    /*
     echo ("service->spreadsheets_values is of class: ".get_class($this->service->spreadsheets_values)."\n");
     //This gives us: service->spreadsheets_values is of class: Google_Service_Sheets_Resource_SpreadsheetsValues
     echo ("service->spreadsheets is of class: ".get_class($this->service->spreadsheets)."\n");
@@ -265,166 +488,7 @@ class GoogleSheets {
     $spec = $chart->getSpec();
     echo ("The class type of chart's specs is : ".get_class($spec)."\n");
     //This gives us: The class type of chart's specs is : Google_Service_Sheets_ChartSpec
-    echo ("The spec contains".json_encode($spec)."\n");
-  }
-
-
-
-  //function to separate the range
-    // public function convertToRangeObject($r){
-    // $range = "AA5:A15";
-    // $splitRange = explode(':', $range);
-    // echo json_encode($splitRange);
-    // // Array( "A1", "AZ15);
-    // $characterValues = Array("A" => 1, "B" => 2, "C"=>3, "D"=>4, "E"=>5,
-    //   "F"=>6, "G"=>7, "H"=>8, "I"=>9, "J"=>10, "K"=>11, "L"=>12, "M"=>13,
-    //   "N"=>14, "O"=>15, "P"=>16, "Q"=>17, "R"=>18, "S"=>19, "T"=>20, "U"=>21,
-    //   "V"=>22, "W"=>23, "X"=>24, "Y"=>25, "Z"=>26);
-
-    // $startingRow = 0;
-    // $startingColumn = 0;
-    // $endingRow = 0;
-    // $endingColumn = 0;
-
-    // $countingArray = Array();
-
-    // $startingString = str_split($splitRange[0]); //A1
-    // echo "startingString - split : ".json_encode($startingString)."\n\n\n";
-    // $endingString = str_split($splitRange[1]); //AZ15
-    // foreach ($startingString as $char) {
-    //   if( isset($characterValues[$char])){
-    //     $countingArray[] = $characterValues[$char]; 
-    //     //$countingArray.push($characterValues[$char]); // (1, 26)
-    //   } else { //number
-    //     $firstOccurance = strpos($splitRange[0], $char); //find occurance
-    //     echo "found first occ : $firstOccurance \n\n\n";
-    //     $startingRow = substr($splitRange[0], $firstOccurance); //1
-    //     break;
-    //   }
-    // }
-    // $power = 0;
-    // for($i=(count($countingArray)-1); $i>=0; $i--) {
-    //   if($i==(count($countingArray)-1)) {
-    //     $startingColumn = $countingArray[$i];
-    //   } else {
-    //     $startingColumn = $startingColumn + ($countingArray[$i]*pow(26,$power));
-    //   }
-    //   $power++;
-    // }
-    // echo ("startingColumn = $startingColumn \n");
-    // echo ("startingRow = $startingRow \n");
-    // }
-
-  public function convertToRangeObject($r) {
-      $range = new \StdClass();
-      $splitRange = explode(":", $r);
-
-      $characterValues = array("A" => 1, "B" => 2, "C"=>3, "D"=>4, "E"=>5, "F"=>6, "G"=>7, "H"=>8,
-      "I"=>9, "J"=>10, "K"=>11, "L"=>12, "M"=>13, "N"=>14, "O"=>15, "P"=>16, "Q"=>17, "R"=>18,
-      "S"=>19, "T"=>20, "U"=>21, "V"=>22, "W"=>23, "X"=>24, "Y"=>25, "Z"=>26);
-
-      $countArray = Array();
-      $startingStr = str_split($splitRange[0]);
-      $endingStr = str_split($splitRange[1]);
-
-      foreach ($startingStr as $char) {
-      if(isset($characterValues[$char])) {
-                  $countArray[] = $characterValues[$char]; //countArray[0]=1
-          } else {
-                  $firstOccur = strpos($splitRange[0], $char);
-                  $startingRow = substr($splitRange[0], $firstOccur);
-                  break;
-        }
-      }
-      $power = 0;
-      for($i=(count($countArray)-1); $i>=0; $i--) {
-        if($i==(count($countArray)-1)) {
-          $startingColumn = $countArray[$i];//this for only one letter
-        } else {
-          $startingColumn = $startingColumn + ($countArray[$i]*pow(26,$power));
-        }
-        $power++;
-      }
-
-      $countArray2 = Array();
-      foreach ($endingStr as $char) {
-      if(isset($characterValues[$char])) {
-                   $countArray2[] = $characterValues[$char];
-          } else {
-                  $firstOccur = strpos($splitRange[1], $char);
-                  $endingRow = substr($splitRange[1], $firstOccur);
-                  break;
-        }
-      }
-
-      for($i=(count($countArray2)-1); $i>=0; $i--) {
-        if($i==(count($countArray2)-1)) {
-          $endingColumn = $countArray2[$i];
-        } else {
-          $endingColumn = $endingColumn + ($countArray2[$i]*pow(26,$power));
-        }
-        $power++;
-      }
-      $range->startRowIndex = $startingRow-1;
-      $range->endRowIndex = $endingRow;
-      $range->startColumnIndex = $startingColumn-1;
-      $range->endColumnIndex = $endingColumn;
-      return $range;
-  }
-  
-  /* @param $range  - (string) - in the format "<start_row_name><start_column_name>:<end_row_name><end_column_name>
-     * example: $range = "A1:C15"
-     * @param $type  - (string) - "number"/"percent" - like I have in the cell spreadsheets.cell.format.batchUpdate.json 
-     * @param $format - (string) - format pattern https://developers.google.com/sheets/api/guides/formats 
-     */
-  public function numberFormat($range, $type, $format = ["text", '#0', '##0.0#%', "$#,##0.00", "yyyy-mm-dd", 
-                                                       "hh:mm:ss.00 a/p", "dddd, m/d/yy at h:mm", "0.00e+00"]) 
-  {
-    $requests = [
-        new \Google_Service_Sheets_Request([
-          'repeatCell' => [
-              'range' => $range,
-              'cell' => [
-                'userEnteredFormat' => $type     //$format, this line may needs some tweaking
-              ],
-              'fields' => 'userEnteredFormat.numberFormat'
-          ],
-        ])
-      ];
-    
-    $batchUpdateRequest = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest(['requests' => $requests]);
-    $response = $this->service->spreadsheets->batchUpdate($this->spreadsheetId, $batchUpdateRequest);
-  }
-
-
-  //  ("TEXT" => "text","NUMBER" => "#0", "PERCENT" => "##0.0#%", "CURRENCY" => "$#,##0.00", 
-  //   "DATE" => "yyyy-mm-dd", "TIME" => "hh:mm:ss.00 a/p", "DATE_TIME" => "dddd, m/d/yy at h:mm", "SCIENTIFIC" => "0.00e+00");
-  // For more patterns   https://developers.google.com/sheets/api/guides/formats
-  // Will set the given user pattern
-  public function cellPatternTest($testPattern){
-    $patternType = new \stdClass();
-
-    echo("\nPattern: ". $testPattern);
-    return $patternType->pattern = $testPattern;
-
-  }
-
-  
-  //will check the type and set it if its right
-  public function cellNumberFormatTest($testType){
-    $formatType = new \stdClass();
-    $formatDefault = array("TEXT", "NUMBER", "PERCENT", "CURRENCY", "DATE", "TIME", "DATE_TIME", "SCIENTIFIC");
-
-    //Checks $formatDefault array  if $test is inside the array
-    if(in_array($testType,$formatDefault)) {
-      echo("Number format: ". $testType);
-      return $formatType->type = $testType;
-    }
-    else {
-      echo("Error: Number format not set correctly");
-    }
-    
-    \Log::info("Format Type : ".json_encode($formatType));
+    echo ("The spec contains".json_encode($spec)."\n"); */
   }
 
 }

@@ -16,13 +16,7 @@
     <!-- Latest Jquery -->
     <script src="http://code.jquery.com/jquery-latest.min.js"
         type="text/javascript"></script>
-    <script type="text/javascript">
-      $.ajaxSetup({
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-      });
-    </script>
+    <script src="{{ asset('js/app.js') }}"></script>
 </head>
 <body>
     <div id="app">
@@ -86,7 +80,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
     <script>
   window.Laravel = <?php echo json_encode([
       'csrfToken' => csrf_token(),

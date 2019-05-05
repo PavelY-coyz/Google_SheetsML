@@ -12,6 +12,7 @@ class VerifyCsrfToken extends BaseVerifier
      * @var array
      */
     protected $except = [
-        //
+      //@WARNING This will need to be removed! This makes it a public API!
+        'api/*'
     ];
 }
