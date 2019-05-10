@@ -19,18 +19,18 @@
   $params = [
     //createSpreadsheet/setGoogleSpreadsheetPermissions technically dont have any parameters.
     //currently unable to call them without having a null parameter....
-    'createSpreadsheet' => (object)['optParams' => null],
-    'setGoogleSpreadsheetPermissions' => (object)['optParams' => null],
-    //'getSpreadsheet' => (object)['id' => "someValidId"],
-    'setValues' => (object)['valueRange' => 'A1:G8', 'values' => $values],
-    'getValues' => (object)['valueRange' => 'A1:G8'],
-    'refreshValues' => (object)['sheetId' => 0],
-    "setBackgroundColor" => (object)['range' => 'A1:G1', 'color' => 'r=100,g=100,b=255', 'sheetId'=>0],
-    'disableCells' => (object)['range' => "A1:G1", 'email'=>'testmail@test.com', 'sheetId'=>0],
-    'setFrozenRow' => (object)['rows' => 0, 'sheetId'=>0],
-    'setHorizontalAlignment' => (object)['alignment'=>"CENTER", "range"=>"A1:G1",'sheetId'=>0],
-    'setCellFormat' => (object)['range'=>"F2:F7", "type"=>"NUMBER", "optParams"=>["pattern"=>"#,##0.0###"]],
-    'setCellFormat' => (object)['range'=>"G2:G7", "type"=>"PERCENT", "optParams"=>["pattern"=>"##0.0#%"]]
+    ['function' => 'createSpreadsheet', 'parameters'=> (object)['optParams' => null]],
+    ['function' => 'setGoogleSpreadsheetPermissions', 'parameters'=> (object)['optParams' => null]],
+    //['getSpreadsheet' => (object)['id' => "someValidId"]],
+    ['function' => 'setValues', 'parameters'=> (object)['valueRange' => 'A1:G8', 'values' => $values]],
+    ['function' => 'getValues', 'parameters'=> (object)['valueRange' => 'A1:G8']],
+    ['function' => 'refreshValues', 'parameters'=> (object)['sheetId' => 0]],
+    ['function' => 'setBackgroundColor', 'parameters'=> (object)['range' => 'A1:G1', 'color' => 'r=100,g=100,b=255', 'sheetId'=>0]],
+    ['function' => 'disableCells', 'parameters'=> (object)['range' => "A1:G1", 'email'=>'testmail@test.com', 'sheetId'=>0]],
+    ['function' => 'setFrozenRow', 'parameters'=> (object)['rows' => 0, 'sheetId'=>0]],
+    ['function' => 'setHorizontalAlignment', 'parameters'=> (object)['alignment'=>"CENTER", "range"=>"A1:G1",'sheetId'=>0]],
+    ['function' => 'setCellFormat', 'parameters'=> (object)['range'=>"F2:F7", "type"=>"NUMBER", "optParams"=>["pattern"=>"#,##0.0###"]]],
+    ['function' => 'setCellFormat', 'parameters'=> (object)['range'=>"G2:G7", "type"=>"PERCENT", "optParams"=>["pattern"=>"##0.0#%"]]]
   ];
 /*  //$params = [];
   Log::info("Line 18 executed");

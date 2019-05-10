@@ -184,8 +184,8 @@ function printArray($arr) {
 
 function validateBatchUpdateParameters($params) {
   $requests = [];
-  foreach($params as $key => $value) {
-    $requests[] = new GoogleAPIRequest($key, $value);
+  foreach($params as $value) {
+    $requests[] = new GoogleAPIRequest($value['function'], $value['parameters']);
   }
   \Log::info(json_encode($requests));
   return $requests;
