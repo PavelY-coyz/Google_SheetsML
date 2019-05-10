@@ -36,4 +36,4 @@ Route::get('/api/Sheets_API/populateSpeadsheet/{id}', 'GoogleSheetsController@po
 
 //testing function
 Route::get('/api/Sheets_API/test/{id}', 'GoogleSheetsController@test');
-Route::get('/api/Sheets_API/setNumberFormat/{id}', 'GoogleSheetsController@setNumberFormat');
+//Route::get('/api/Sheets_API/setNumberFormat/{id}', 'GoogleSheetsController@setNumberFormat');

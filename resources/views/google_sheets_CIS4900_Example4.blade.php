@@ -5,32 +5,56 @@
   require_once(resource_path("util/util.php"));
 
   $values = [
-    ["Model Number","Sales - Jan","Sales - Feb", "Sales - Mar", "Total Sales",
-      "Formating Test \n Number \n #,##0.0###",
-      "Formating Text \n Percentage \n ##0.0#"],
-    ["D-01X", "=FLOOR(100*RAND())", 74, "60", "=SUM(B2:D2)", "10000", 0.10],
-    ["FR-0B1", "=FLOOR(100*RAND())", 76, "88", "=SUM(B3:D3)", "10000.1234567", 0.10],
-    ["P-034", "=FLOOR(100*RAND())", 49, "32", "=SUM(B4:D4)", "12,345.678910", 0.10],
-    ["P-105", "=FLOOR(100*RAND())", 44, "67", "=SUM(B5:D5)", "900.10",0.10],
-    ["W-11", "=FLOOR(100*RAND())", 68, "87", "=SUM(B6:D6)", "600.0005",0.10],
-    ["W-22", "=FLOOR(100*RAND())", 52, "62", "=SUM(B7:D7)", "600.00005",0.10]
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 0 ", '=COUNTIF(A1:J10, "=0")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 1 ", '=COUNTIF(A1:J10, "=1")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 2 ", '=COUNTIF(A1:J10, "=2")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 3 ", '=COUNTIF(A1:J10, "=3")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 4 ", '=COUNTIF(A1:J10, "=4")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 5 ", '=COUNTIF(A1:J10, "=5")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 6 ", '=COUNTIF(A1:J10, "=6")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 7 ", '=COUNTIF(A1:J10, "=7")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 8 ", '=COUNTIF(A1:J10, "=8")'],
+    ["=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", 
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)",
+      "=RANDBETWEEN(0,9)", "=RANDBETWEEN(0,9)", "", "occurrences of 9 ", '=COUNTIF(A1:J10, "=9")'],
+    [""],
+    ["", "", "", "", "", "", "", "", "", "", "", "mode= ", "=MODE(A1:J10)"]
   ];
 
+  //Calling the same function multiple times will override each other
   $params = [
     //createSpreadsheet/setGoogleSpreadsheetPermissions technically dont have any parameters.
     //currently unable to call them without having a null parameter....
     'createSpreadsheet' => (object)['optParams' => null],
     'setGoogleSpreadsheetPermissions' => (object)['optParams' => null],
-    //'getSpreadsheet' => (object)['id' => "someValidId"],
-    'setValues' => (object)['valueRange' => 'A1:G8', 'values' => $values],
-    'getValues' => (object)['valueRange' => 'A1:G8'],
+    'setValues' => (object)['valueRange' => 'A1:M12', 'values' => $values],
     'refreshValues' => (object)['sheetId' => 0],
-    "setBackgroundColor" => (object)['range' => 'A1:G1', 'color' => 'r=100,g=100,b=255', 'sheetId'=>0],
-    'disableCells' => (object)['range' => "A1:G1", 'email'=>'testmail@test.com', 'sheetId'=>0],
-    'setFrozenRow' => (object)['rows' => 0, 'sheetId'=>0],
-    'setHorizontalAlignment' => (object)['alignment'=>"CENTER", "range"=>"A1:G1",'sheetId'=>0],
-    'setCellFormat' => (object)['range'=>"F2:F7", "type"=>"NUMBER", "optParams"=>["pattern"=>"#,##0.0###"]],
-    'setCellFormat' => (object)['range'=>"G2:G7", "type"=>"PERCENT", "optParams"=>["pattern"=>"##0.0#%"]]
+    "setBackgroundColor" => (object)['range' => 'A1:J10', 'color' => 'r=255,g=255,b=255', 'sheetId'=>0],
+    'disableCells' => (object)['range' => "A1:M12", 'email'=>'testmail@test.com', 'sheetId'=>0],
+    'setHorizontalAlignment' => (object)['alignment'=>"LEFT", "range"=>"A1:J10",'sheetId'=>0],
+    //When calling setCellFormat over a range of multiple columns/rows(A1:J10) with a custom pattern, an issue will occur where
+    //random cells that contains the formula will be blank desipte clicking the cell and containing a function.
+    //current workaround is to call the setCellFormat by per row or per column individually or no customized pattern over the range
+    //if there are still blanks afterwards, call the refresh function to have them reappear
+    'setCellFormat' => (object)['range'=>"A1:J10", "type"=>"NUMBER", "optParams"=>[""]],
   ];
 /*  //$params = [];
   Log::info("Line 18 executed");

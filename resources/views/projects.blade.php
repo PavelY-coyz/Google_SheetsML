@@ -18,5 +18,32 @@
         <a href="/projects/google_sheets_CIS4900" class="btn btn-primary">View Project</a>
       </div>
     </div>
+
+
+  <div class="card project-card bg-light mb-3 border-secondary" style="max-width: 18rem; display:inline-block">
+      <img class="card-img-top" style="width: 18rem;" src="images\Google_API.png" alt="Card image cap">
+      <div class="card-body text-secondary">
+        <p class="card-text">CIS4900 Spreadsheet Example #2</p>
+        <a href="/projects/google_sheets_CIS4900_Example2" class="btn btn-primary">View Example 2</a>
+      </div>
+    </div>
+
+  <div class="card project-card bg-light mb-3 border-secondary" style="max-width: 18rem; display:inline=block">
+      <img class="card-img-top" style="width: 18rem;" src="images\Google_API.png" alt="Card image cap">
+      <div class="card-body text-secondary">
+        <p class="card-text">CIS4900 Spreadsheet Example #4</p>
+        <a href="/projects/google_sheets_CIS4900_Example4" class="btn btn-primary">View Example 4</a>
+      </div>
+    </div>
+
+  <div class="card project-card bg-light mb-3 border-secondary" style="max-width: 18rem; display:inline=block">
+      <img class="card-img-top" style="width: 18rem;" src="images\Google_API.png" alt="Card image cap">
+      <div class="card-body text-secondary">
+        <p class="card-text">CIS4900 Spreadsheet Example #6</p>
+        <a href="/projects/google_sheets_CIS4900_Example6" class="btn btn-primary">View Example 6</a>
+      </div>
+    </div>
+
   </div>
+
 @endsection
