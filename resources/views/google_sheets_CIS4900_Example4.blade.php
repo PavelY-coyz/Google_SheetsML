@@ -43,18 +43,25 @@
   $params = [
     //createSpreadsheet/setGoogleSpreadsheetPermissions technically dont have any parameters.
     //currently unable to call them without having a null parameter....
-    'createSpreadsheet' => (object)['optParams' => null],
-    'setGoogleSpreadsheetPermissions' => (object)['optParams' => null],
-    'setValues' => (object)['valueRange' => 'A1:M12', 'values' => $values],
-    'refreshValues' => (object)['sheetId' => 0],
-    "setBackgroundColor" => (object)['range' => 'A1:J10', 'color' => 'r=255,g=255,b=255', 'sheetId'=>0],
-    'disableCells' => (object)['range' => "A1:M12", 'email'=>'testmail@test.com', 'sheetId'=>0],
-    'setHorizontalAlignment' => (object)['alignment'=>"LEFT", "range"=>"A1:J10",'sheetId'=>0],
+    ['function' => 'createSpreadsheet', 'parameters'=> (object)['optParams' => null]],
+    ['function' => 'setGoogleSpreadsheetPermissions', 'parameters'=> (object)['optParams' => null]],
+    //['getSpreadsheet' => (object)['id' => "someValidId"]],
+    ['function' => 'setValues', 'parameters'=> (object)['valueRange' => 'A1:M12', 'values' => $values]],
+    //['function' => 'getValues', 'parameters'=> (object)['valueRange' => 'A1:G8']],
+    ['function' => 'refreshValues', 'parameters'=> (object)['sheetId' => 0]],
+    ['function' => 'setBackgroundColor', 'parameters'=> (object)['range' => 'A1:M12', 'color' => 'r=255,g=255,b=255', 'sheetId'=>0]],
+    ['function' => 'disableCells', 'parameters'=> (object)['range' => "A1:J10", 'email'=>'testmail@test.com', 'sheetId'=>0]],
+    ['function' => 'disableCells', 'parameters'=> (object)['range' => "L1:M10", 'email'=>'testmail@test.com', 'sheetId'=>0]],
+    ['function' => 'disableCells', 'parameters'=> (object)['range' => "L12:M12", 'email'=>'testmail@test.com', 'sheetId'=>0]],
+    //['function' => 'setFrozenRow', 'parameters'=> (object)['rows' => 0, 'sheetId'=>0]],
+    ['function' => 'setHorizontalAlignment', 'parameters'=> (object)['alignment'=>"LEFT", "range"=>"A1:M12",'sheetId'=>0]],
     //When calling setCellFormat over a range of multiple columns/rows(A1:J10) with a custom pattern, an issue will occur where
     //random cells that contains the formula will be blank desipte clicking the cell and containing a function.
     //current workaround is to call the setCellFormat by per row or per column individually or no customized pattern over the range
     //if there are still blanks afterwards, call the refresh function to have them reappear
-    'setCellFormat' => (object)['range'=>"A1:J10", "type"=>"NUMBER", "optParams"=>[""]],
+    ['function' => 'setCellFormat', 'parameters'=> (object)['range'=>"A1:J10", "type"=>"NUMBER", "optParams"=>["pattern"=>""]]],
+    ['function' => 'setCellFormat', 'parameters'=> (object)['range'=>"L1:L12", "type"=>"TEXT", "optParams"=>["pattern"=>""]]],
+    ['function' => 'setCellFormat', 'parameters'=> (object)['range'=>"M1:M12", "type"=>"NUMBER", "optParams"=>["pattern"=>""]]]
   ];
 /*  //$params = [];
   Log::info("Line 18 executed");
