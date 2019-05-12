@@ -19,13 +19,23 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/projects', 'PageController@getProjects')->name('projects');
+Route::get('/testPHP', 'TestPHPController@test');
 
 Route::get('/projects/{id}', 'GoogleSheetsController@getGoogleSheets');
+Route::get('/projects/google_sheets_sample1/{id}', 'GoogleSheetsController@getGoogleSheets');
+Route::get('/projects/google_sheets_sample3/{id}', 'GoogleSheetsController@getGoogleSheets');
+Route::get('/projects/google_sheets_sample5/{id}', 'GoogleSheetsController@getGoogleSheets');
 
-Route::get('/api/Sheets_API/refreshSheetValues/{id}', 'GoogleSheetsController@refreshSheetValues');
+Route::get('/api/Sheets_API/refreshValuesRequest/{id}', 'GoogleSheetsController@refreshValuesRequest');
+Route::get('/api/Sheets_API/setBackgroundColorRequest/{id}', 'GoogleSheetsController@setBackgroundColorRequest');
+Route::get('/api/Sheets_API/disableCellsRequest/{id}', 'GoogleSheetsController@disableCellsRequest');
+Route::get('/api/Sheets_API/addFrozenRowRequest/{id}', 'GoogleSheetsController@addFrozenRowRequest');
+Route::get('/api/Sheets_API/setHorizontalAlignmentRequest/{id}', 'GoogleSheetsController@setHorizontalAlignmentRequest');
+Route::get('/api/Sheets_API/setCellFormatRequest/{id}', 'GoogleSheetsController@setCellFormatRequest');
+Route::post('/api/Sheets_API/batchUpdate', 'GoogleSheetsController@batchUpdate');
+
+//Will be removed
 Route::get('/api/Sheets_API/populateSpeadsheet/{id}', 'GoogleSheetsController@populateSpreadsheet');
+
+//testing function
 Route::get('/api/Sheets_API/test/{id}', 'GoogleSheetsController@test');
-Route::get('/api/Sheets_API/setBackgroundColor/{id}', 'GoogleSheetsController@setBackgroundColor');
-Route::get('/api/Sheets_API/disableCells/{id}', 'GoogleSheetsController@disableCells');
-Route::get('/api/Sheets_API/addFrozenRow/{id}', 'GoogleSheetsController@addFrozenRow');
-Route::get('/api/Sheets_API/setHorizontalAlignment/{id}', 'GoogleSheetsController@setHorizontalAlignment');
